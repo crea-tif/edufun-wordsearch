@@ -1,114 +1,94 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0ea5e9">
-  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0b1b2b">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifeste.webmanifest">
   <link rel="icon" sizes="192x192" href="assets/icons/icon-192.png">
   <link rel="icon" sizes="512x512" href="assets/icons/icon-512.png">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- CSS -->
   <link rel="stylesheet" href="assets/css/noto-ar.css">
   <link rel="stylesheet" href="assets/css/app.css">
 
-  <!-- PWA hooks -->
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0b1b2b">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" sizes="192x192" href="assets/icons/icon-192.png">
-  <link rel="icon" sizes="512x512" href="assets/icons/icon-512.png">
-  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <!-- Tajawal offline (drop Tajawal.woff2 into /assets/fonts/) -->
+  <!-- (Optionnel) Tajawal hors-ligne si tu as copié les .woff2 à la racine -->
   <style>
-    @font-face{
-      font-family: 'Tajawal';
-      src: url('assets/fonts/Tajawal.woff2') format('woff2');
-      font-display: swap;
-    }
-    html[lang="ar"], [dir="rtl"], .ar, :lang(ar){
-      font-family: 'Tajawal', system-ui, -apple-system, Segoe UI, Arial, sans-serif;
-    }
-    body{ background:#091827; color:#e8f0ff; }
+    @font-face{font-family:"Tajawal";font-weight:400;font-style:normal;font-display:swap;src:url("./Tajawal-Regular.woff2") format("woff2");}
+    @font-face{font-family:"Tajawal";font-weight:700;font-style:normal;font-display:swap;src:url("./Tajawal-Bold.woff2") format("woff2");}
+    @font-face{font-family:"Tajawal";font-weight:800;font-style:normal;font-display:swap;src:url("./Tajawal-ExtraBold.woff2") format("woff2");}
   </style>
+
+  <title>EDUFUN — WordSearch Mini</title>
+
   <script>
+    // Enregistrement du Service Worker (nécessaire à l’installable + offline)
     if ('serviceWorker' in navigator) {
       addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
     }
   </script>
 
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-<title>EDUFUN — WordSearch Mini (v6.5A • Tajawal + Click + Confetti)</title>
+  <!-- Styles spécifiques de l'app (repris de ta version) -->
+  <style>
+    :root{
+      --bg:#0b1420; --panel:#0f1b2a; --ink:#e9f1ff; --muted:#a9bed8; --accent:#21c07a;
+      --cell:#0a1524; --cell-sel:#1a7e4d; --cell-ok:#1aa75f; --border:#4d8ed1;
+      --gap:8px; --shell-w:min(92vw,680px);
+    }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;background:linear-gradient(180deg,#0b1420,#081019);color:var(--ink);
+      font-family:Inter,system-ui,"Tajawal",sans-serif}
+    body[dir="rtl"]{font-family:"Tajawal",system-ui,sans-serif}
 
-<!-- 1) Tajawal en LIGNE (Google Fonts) -->
+    .container{max-width:980px;margin-inline:auto;padding:16px}
+    h1{margin:6px 0 14px;font-size:clamp(20px,3.6vw,34px)}
+    .card{background:var(--panel);border-radius:16px;padding:14px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
 
+    .controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .controls .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    label{color:var(--muted);font-size:14px}
+    select,input[type="range"]{background:#0b1626;color:var(--ink);border:1px solid #254c7b;border-radius:10px;padding:6px 10px}
+    button{background:var(--accent);color:#052016;border:0;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+    .header-bar{background:#0d1b2c;padding:10px;border-radius:10px;text-align:center;font-weight:800}
 
-<!-- 2) Tajawal HORS LIGNE (si les .woff2 sont à côté du fichier, ils prendront le relais) -->
-<style>
-@font-face{font-family:"Tajawal";font-weight:400;font-style:normal;font-display:swap;src:url("./Tajawal-Regular.woff2") format("woff2");}
-@font-face{font-family:"Tajawal";font-weight:700;font-style:normal;font-display:swap;src:url("./Tajawal-Bold.woff2") format("woff2");}
-@font-face{font-family:"Tajawal";font-weight:800;font-style:normal;font-display:swap;src:url("./Tajawal-ExtraBold.woff2") format("woff2");}
-</style>
+    .grid-shell{display:flex;justify-content:center}
+    #grid-wrap{width:var(--shell-w);padding:12px;border:1px solid #24496e;border-radius:14px;background:#0e1826;margin:0 auto}
+    #grid{display:grid;grid-template-columns:repeat(var(--N,12),1fr);gap:var(--gap);width:100%;touch-action:none}
 
-<style>
-:root{
-  --bg:#0b1420; --panel:#0f1b2a; --ink:#e9f1ff; --muted:#a9bed8; --accent:#21c07a;
-  --cell:#0a1524; --cell-sel:#1a7e4d; --cell-ok:#1aa75f; --border:#4d8ed1;
-  --gap:8px; --shell-w:min(92vw,680px);
-}
-*{box-sizing:border-box} html,body{height:100%}
-body{margin:0;background:linear-gradient(180deg,#0b1420,#081019);color:var(--ink);
-  font-family:Inter,system-ui,"Tajawal",sans-serif}
-body[dir="rtl"]{font-family:"Tajawal",system-ui,sans-serif}
+    .cell{
+      background:var(--cell); border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      color:#f1f6ff; font-weight:800; aspect-ratio:1/1;
+      font-size: clamp(14px, calc( ((var(--shell-w) - (var(--N) - 1) * var(--gap)) / var(--N)) * 0.56 ), 48px);
+      line-height:1; border-radius:0; user-select:none; -webkit-user-select:none;
+      -webkit-tap-highlight-color: transparent; white-space:nowrap; overflow:hidden; text-overflow:clip;
+      letter-spacing:0; box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);
+    }
+    body[dir="rtl"] .cell{ font-size: clamp(13px, calc( ((var(--shell-w) - (var(--N) - 1) * var(--gap)) / var(--N)) * 0.52 ), 44px); }
 
-.container{max-width:980px;margin-inline:auto;padding:16px}
-h1{margin:6px 0 14px;font-size:clamp(20px,3.6vw,34px)}
-.card{background:var(--panel);border-radius:16px;padding:14px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+    .cell.sel{background:var(--cell-sel);border-color:#2bd083}
+    .cell.ok{background:var(--cell-ok);border-color:#3de58e;color:#fff}
+    .cell.sol{outline:3px dashed #ffa726;outline-offset:-6px}
 
-.controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.controls .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-label{color:var(--muted);font-size:14px}
-select,input[type="range"]{background:#0b1626;color:var(--ink);border:1px solid #254c7b;border-radius:10px;padding:6px 10px}
-button{background:var(--accent);color:#052016;border:0;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
-.header-bar{background:#0d1b2c;padding:10px;border-radius:10px;text-align:center;font-weight:800}
+    .words{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;justify-content:center}
+    .words .chip{background:#142944;border:1px dashed #274a77;color:#d4e6ff;padding:8px 12px;border-radius:999px;font-weight:700}
+    .words .chip.ok{background:#0f3b24;border-color:#1f9d55;color:#bff6d1}
 
-.grid-shell{display:flex;justify-content:center}
-#grid-wrap{width:var(--shell-w);padding:12px;border:1px solid #24496e;border-radius:14px;background:#0e1826;margin:0 auto}
-#grid{display:grid;grid-template-columns:repeat(var(--N,12),1fr);gap:var(--gap);width:100%;touch-action:none}
+    .cont-africa{--cell-sel:#1a7e4d}
+    .cont-europe{--cell-sel:#1f6fe0}
+    .cont-asia{--cell-sel:#b84ce6}
+    .cont-north_america{--cell-sel:#ff7a1a}
+    .cont-south_america{--cell-sel:#ff4d6d}
+    .cont-oceania{--cell-sel:#13b5b1}
 
-/* === Cellules carrées et texte qui ne déborde JAMAIS === */
-.cell{
-  background:var(--cell); border:1px solid var(--border);
-  display:flex; align-items:center; justify-content:center;  /* centrage parfait */
-  color:#f1f6ff; font-weight:800; aspect-ratio:1/1;
-  /* taille calculée + garde-fous pour mobiles étroits */
-  font-size: clamp(14px, calc( ((var(--shell-w) - (var(--N) - 1) * var(--gap)) / var(--N)) * 0.56 ), 48px);
-  line-height:1; border-radius:0; user-select:none; -webkit-user-select:none;
-  -webkit-tap-highlight-color: transparent; white-space:nowrap; overflow:hidden; text-overflow:clip;
-  letter-spacing:0; /* pour l’arabe, éviter l’écartement */
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);
-}
-/* pour l’arabe on réduit un tout petit peu la taille afin d’éviter tout dépassement visuel */
-body[dir="rtl"] .cell{ font-size: clamp(13px, calc( ((var(--shell-w) - (var(--N) - 1) * var(--gap)) / var(--N)) * 0.52 ), 44px); }
-
-.cell.sel{background:var(--cell-sel);border-color:#2bd083}
-.cell.ok{background:var(--cell-ok);border-color:#3de58e;color:#fff}
-.cell.sol{outline:3px dashed #ffa726;outline-offset:-6px}
-
-.words{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;justify-content:center}
-.words .chip{background:#142944;border:1px dashed #274a77;color:#d4e6ff;padding:8px 12px;border-radius:999px;font-weight:700}
-.words .chip.ok{background:#0f3b24;border-color:#1f9d55;color:#bff6d1}
-
-/* Couleurs par continent */
-.cont-africa{--cell-sel:#1a7e4d}
-.cont-europe{--cell-sel:#1f6fe0}
-.cont-asia{--cell-sel:#b84ce6}
-.cont-north_america{--cell-sel:#ff7a1a}
-.cont-south_america{--cell-sel:#ff4d6d}
-.cont-oceania{--cell-sel:#13b5b1}
-
-@media (max-width:560px){ .controls{grid-template-columns:1fr} }
-</style>
+    @media (max-width:560px){ .controls{grid-template-columns:1fr} }
+  </style>
 </head>
 <body>
 <div class="container">
@@ -170,7 +150,7 @@ body[dir="rtl"] .cell{ font-size: clamp(13px, calc( ((var(--shell-w) - (var(--N)
 </div>
 
 <script>
-/* ======== DONNÉES (idem v6.5) ======== */
+/* ======== DONNÉES ======== */
 const DATA = {
   fr:{africa:["Algérie","Tunisie","Maroc","Libye","Égypte","Soudan","Kenya","Gabon","Bénin","Ghana","Mali","Niger","Malawi","Namibie","Mozambique","Togo","Cameroun","Sénégal","Botswana","Zambie"],
       europe:["France","Espagne","Italie","Allemagne","Portugal","Belgique","Suisse","Grèce","Suède","Norvège","Danemark","Irlande"],
@@ -210,7 +190,7 @@ const newBtn=$("#new"), solBtn=$("#toggleSol"), wordsRange=$("#wordsCount"), wor
 const sound=$("#sound");
 wordsRange.addEventListener("input",()=>wordsLabel.textContent=wordsRange.value);
 
-/* Direction RTL quand arabe */
+/* RTL si arabe */
 function syncDir(){ document.body.dir = (lang.value==="ar")?"rtl":"ltr"; }
 lang.addEventListener("change",syncDir); syncDir();
 /* Couleur par continent */
@@ -232,7 +212,7 @@ function victorySound(){ if(!sound.checked) return; const ac=ensureCtx(), notes=
 
 /* CONSTRUCTION */
 let STATE={};
-function shuffle(a){for(let i=a.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[a[i],a[j]]=[a[j],a[i]]}return a}
+function shuffle(a){for(let i=a.length-1;i>0;i++){const j=(Math.random()*(i+1))|0;[a[i],a[j]]=[a[j],a[i]]}return a}
 
 function makeGrid(){
   const lg=lang.value, cont=continent.value, N=+size.value, allowDiag=diag.checked, allowRev=rev.checked, maxW=+wordsRange.value;
