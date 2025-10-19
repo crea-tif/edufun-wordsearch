@@ -1,0 +1,1 @@
+console.log('EDUFUN AR_ONLY (Noto Kufi Arabic) shell chargé.');

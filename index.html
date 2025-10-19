@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0ea5e9">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" sizes="192x192" href="assets/icons/icon-192.png">
+  <link rel="icon" sizes="512x512" href="assets/icons/icon-512.png">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <link rel="stylesheet" href="assets/css/noto-ar.css">
+  <link rel="stylesheet" href="assets/css/app.css">
+
+  <!-- PWA hooks -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1b2b">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" sizes="192x192" href="assets/icons/icon-192.png">
+  <link rel="icon" sizes="512x512" href="assets/icons/icon-512.png">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <!-- Tajawal offline (drop Tajawal.woff2 into /assets/fonts/) -->
+  <style>
+    @font-face{
+      font-family: 'Tajawal';
+      src: url('assets/fonts/Tajawal.woff2') format('woff2');
+      font-display: swap;
+    }
+    html[lang="ar"], [dir="rtl"], .ar, :lang(ar){
+      font-family: 'Tajawal', system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+    }
+    body{ background:#091827; color:#e8f0ff; }
+  </style>
+  <script>
+    if ('serviceWorker' in navigator) {
+      addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+    }
+  </script>
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>EDUFUN — WordSearch Mini (v6.5A • Tajawal + Click + Confetti)</title>
+
+<!-- 1) Tajawal en LIGNE (Google Fonts) -->
+
+
+<!-- 2) Tajawal HORS LIGNE (si les .woff2 sont à côté du fichier, ils prendront le relais) -->
+<style>
+@font-face{font-family:"Tajawal";font-weight:400;font-style:normal;font-display:swap;src:url("./Tajawal-Regular.woff2") format("woff2");}
+@font-face{font-family:"Tajawal";font-weight:700;font-style:normal;font-display:swap;src:url("./Tajawal-Bold.woff2") format("woff2");}
+@font-face{font-family:"Tajawal";font-weight:800;font-style:normal;font-display:swap;src:url("./Tajawal-ExtraBold.woff2") format("woff2");}
+</style>
+
+<style>
+:root{
+  --bg:#0b1420; --panel:#0f1b2a; --ink:#e9f1ff; --muted:#a9bed8; --accent:#21c07a;
+  --cell:#0a1524; --cell-sel:#1a7e4d; --cell-ok:#1aa75f; --border:#4d8ed1;
+  --gap:8px; --shell-w:min(92vw,680px);
+}
+*{box-sizing:border-box} html,body{height:100%}
+body{margin:0;background:linear-gradient(180deg,#0b1420,#081019);color:var(--ink);
+  font-family:Inter,system-ui,"Tajawal",sans-serif}
+body[dir="rtl"]{font-family:"Tajawal",system-ui,sans-serif}
+
+.container{max-width:980px;margin-inline:auto;padding:16px}
+h1{margin:6px 0 14px;font-size:clamp(20px,3.6vw,34px)}
+.card{background:var(--panel);border-radius:16px;padding:14px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+
+.controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.controls .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+label{color:var(--muted);font-size:14px}
+select,input[type="range"]{background:#0b1626;color:var(--ink);border:1px solid #254c7b;border-radius:10px;padding:6px 10px}
+button{background:var(--accent);color:#052016;border:0;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+.header-bar{background:#0d1b2c;padding:10px;border-radius:10px;text-align:center;font-weight:800}
+
+.grid-shell{display:flex;justify-content:center}
+#grid-wrap{width:var(--shell-w);padding:12px;border:1px solid #24496e;border-radius:14px;background:#0e1826;margin:0 auto}
+#grid{display:grid;grid-template-columns:repeat(var(--N,12),1fr);gap:var(--gap);width:100%;touch-action:none}
+
+/* === Cellules carrées et texte qui ne déborde JAMAIS === */
+.cell{
+  background:var(--cell); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;  /* centrage parfait */
+  color:#f1f6ff; font-weight:800; aspect-ratio:1/1;
+  /* taille calculée + garde-fous pour mobiles étroits */
+  font-size: clamp(14px, calc( ((var(--shell-w) - (var(--N) - 1) * var(--gap)) / var(--N)) * 0.56 ), 48px);
+  line-height:1; border-radius:0; user-select:none; -webkit-user-select:none;
+  -webkit-tap-highlight-color: transparent; white-space:nowrap; overflow:hidden; text-overflow:clip;
+  letter-spacing:0; /* pour l’arabe, éviter l’écartement */
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);
+}
+/* pour l’arabe on réduit un tout petit peu la taille afin d’éviter tout dépassement visuel */
+body[dir="rtl"] .cell{ font-size: clamp(13px, calc( ((var(--shell-w) - (var(--N) - 1) * var(--gap)) / var(--N)) * 0.52 ), 44px); }
+
+.cell.sel{background:var(--cell-sel);border-color:#2bd083}
+.cell.ok{background:var(--cell-ok);border-color:#3de58e;color:#fff}
+.cell.sol{outline:3px dashed #ffa726;outline-offset:-6px}
+
+.words{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;justify-content:center}
+.words .chip{background:#142944;border:1px dashed #274a77;color:#d4e6ff;padding:8px 12px;border-radius:999px;font-weight:700}
+.words .chip.ok{background:#0f3b24;border-color:#1f9d55;color:#bff6d1}
+
+/* Couleurs par continent */
+.cont-africa{--cell-sel:#1a7e4d}
+.cont-europe{--cell-sel:#1f6fe0}
+.cont-asia{--cell-sel:#b84ce6}
+.cont-north_america{--cell-sel:#ff7a1a}
+.cont-south_america{--cell-sel:#ff4d6d}
+.cont-oceania{--cell-sel:#13b5b1}
+
+@media (max-width:560px){ .controls{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🌍 EDUFUN — WordSearch Mini</h1>
+
+  <div class="card">
+    <div class="controls">
+      <div class="row"><label>Continent :</label>
+        <select id="continent">
+          <option value="africa">Afrique</option>
+          <option value="europe">Europe</option>
+          <option value="asia">Asie</option>
+          <option value="north_america">Amérique du Nord</option>
+          <option value="south_america">Amérique du Sud</option>
+          <option value="oceania">Océanie</option>
+        </select>
+      </div>
+      <div class="row"><label>Langue :</label>
+        <select id="lang">
+          <option value="fr">Français</option>
+          <option value="en">English</option>
+          <option value="es">Español</option>
+          <option value="ar">العربية</option>
+        </select>
+      </div>
+      <div class="row"><label>Taille :</label>
+        <select id="size">
+          <option>6</option><option>8</option><option>10</option>
+          <option>12</option><option selected>14</option><option>16</option>
+        </select>
+      </div>
+      <div class="row">
+        <label><input type="checkbox" id="diag" checked> diagonales</label>
+        <label><input type="checkbox" id="rev" checked> mots inversés</label>
+      </div>
+      <div class="row">
+        <label><input type="checkbox" id="sound" checked> son (click)</label>
+      </div>
+      <div class="row"><label>Mots :</label>
+        <input id="wordsCount" type="range" min="4" max="24" value="20">
+        <span id="wordsCountLabel">20</span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="new">Nouvelle grille</button>
+      <button id="toggleSol">Afficher les solutions</button>
+    </div>
+
+    <div id="titleBar" class="header-bar">—</div>
+
+    <div class="grid-shell">
+      <div id="grid-wrap" class="cont-africa">
+        <div id="grid" style="--N:14"></div>
+        <div id="words" class="words"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ======== DONNÉES (idem v6.5) ======== */
+const DATA = {
+  fr:{africa:["Algérie","Tunisie","Maroc","Libye","Égypte","Soudan","Kenya","Gabon","Bénin","Ghana","Mali","Niger","Malawi","Namibie","Mozambique","Togo","Cameroun","Sénégal","Botswana","Zambie"],
+      europe:["France","Espagne","Italie","Allemagne","Portugal","Belgique","Suisse","Grèce","Suède","Norvège","Danemark","Irlande"],
+      asia:["Arabie","Japon","Chine","Inde","Pakistan","Iran","Irak","Syrie","Liban","Qatar","Yémen","Jordanie"],
+      north_america:["Canada","ÉtatsUnis","Mexique","Cuba","Haïti","Jamaïque"],
+      south_america:["Brésil","Argentine","Chili","Pérou","Uruguay","Paraguay","Colombie"],
+      oceania:["Australie","NouvelleZélande","Fidji","Samoa","Tonga","Kiribati"]},
+  en:{africa:["Algeria","Tunisia","Morocco","Libya","Egypt","Sudan","Kenya","Gabon","Benin","Ghana","Mali","Niger","Malawi","Namibia","Mozambique","Togo","Cameroon","Senegal","Botswana","Zambia"],
+      europe:["France","Spain","Italy","Germany","Portugal","Belgium","Sweden","Norway","Denmark","Ireland","Greece","Poland"],
+      asia:["Saudi","Japan","China","India","Pakistan","Iran","Iraq","Syria","Lebanon","Qatar","Yemen","Jordan"],
+      north_america:["Canada","UnitedStates","Mexico","Cuba","Haiti","Jamaica"],
+      south_america:["Brazil","Argentina","Chile","Peru","Uruguay","Paraguay","Colombia"],
+      oceania:["Australia","NewZealand","Fiji","Samoa","Tonga","Kiribati"]},
+  es:{africa:["Argelia","Túnez","Marruecos","Libia","Egipto","Sudán","Kenia","Gabón","Benín","Ghana","Malí","Níger","Malaui","Namibia","Mozambique","Togo","Camerún","Senegal","Botsuana","Zambia"],
+      europe:["Francia","España","Italia","Alemania","Portugal","Bélgica","Suecia","Noruega","Dinamarca","Irlanda","Grecia","Polonia"],
+      asia:["Arabia","Japón","China","India","Pakistán","Irán","Irak","Siria","Líbano","Catar","Yemen","Jordania"],
+      north_america:["Canadá","EstadosUnidos","México","Cuba","Haití","Jamaica"],
+      south_america:["Brasil","Argentina","Chile","Perú","Uruguay","Paraguay","Colombia"],
+      oceania:["Australia","NuevaZelanda","Fiyi","Samoa","Tonga","Kiribati"]},
+  ar:{africa:["الجزائر","تونس","المغرب","ليبيا","مصر","السودان","كينيا","الغابون","بنين","غانا","مالي","النيجر","مالاوي","ناميبيا","الموزمبيق","توغو","الكاميرون","السنغال","بوتسوانا","زامبيا"],
+      europe:["فرنسا","إسبانيا","إيطاليا","ألمانيا","البرتغال","بلجيكا","السويد","النرويج","الدنمارك","إيرلندا","اليونان","بولندا"],
+      asia:["السعودية","اليابان","الصين","الهند","باكستان","إيران","العراق","سوريا","لبنان","قطر","اليمن","الأردن"],
+      north_america:["كندا","الولايات_المتحدة","المكسيك","كوبا","هايتي","جامايكا"],
+      south_america:["البرازيل","الأرجنتين","تشيلي","بيرو","الأوروغواي","باراغواي","كولومبيا"],
+      oceania:["أستراليا","نيوزيلندا","فيجي","ساموا","تونغا","كيريباتي"]}
+};
+const LETTERS={fr:"ABCDEFGHIJKLMNOPQRSTUVWXYZ",en:"ABCDEFGHIJKLMNOPQRSTUVWXYZ",es:"ABCDEFGHIJKLMNÑOPQRSTUVWXYZ",ar:"ابتثجحخدذرزسشصضطظعغفقكلمنهوي"};
+const titleBy={fr:{africa:"Afrique",europe:"Europe",asia:"Asie",north_america:"Amérique du Nord",south_america:"Amérique du Sud",oceania:"Océanie"},
+              en:{africa:"Africa",europe:"Europe",asia:"Asia",north_america:"North America",south_america:"South America",oceania:"Oceania"},
+              es:{africa:"África",europe:"Europa",asia:"Asia",north_america:"América del Norte",south_america:"América del Sur",oceania:"Oceanía"},
+              ar:{africa:"إفريقيا",europe:"أوروبا",asia:"آسيا",north_america:"أمريكا الشمالية",south_america:"أمريكا الجنوبية",oceania:"أوقيانوسيا"}};
+
+const $=s=>document.querySelector(s);
+const grid=$("#grid"), wordsEl=$("#words"), titleBar=$("#titleBar");
+const continent=$("#continent"), lang=$("#lang"), size=$("#size"), diag=$("#diag"), rev=$("#rev");
+const newBtn=$("#new"), solBtn=$("#toggleSol"), wordsRange=$("#wordsCount"), wordsLabel=$("#wordsCountLabel");
+const sound=$("#sound");
+wordsRange.addEventListener("input",()=>wordsLabel.textContent=wordsRange.value);
+
+/* Direction RTL quand arabe */
+function syncDir(){ document.body.dir = (lang.value==="ar")?"rtl":"ltr"; }
+lang.addEventListener("change",syncDir); syncDir();
+/* Couleur par continent */
+function setAccent(){ const wrap=$("#grid-wrap"); wrap.className=""; wrap.classList.add("cont-"+continent.value); }
+continent.addEventListener("change",setAccent); setAccent();
+
+/* AUDIO */
+let actx=null; function ensureCtx(){ if(!actx){ actx=new (window.AudioContext||window.webkitAudioContext)(); } return actx; }
+function clickSound(){ if(!sound.checked) return; const ac=ensureCtx(), o=ac.createOscillator(), g=ac.createGain();
+  o.type="square"; o.frequency.value=880; o.connect(g); g.connect(ac.destination);
+  const t=ac.currentTime; g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.25,t+0.01); g.gain.exponentialRampToValueAtTime(0.0001,t+0.09);
+  o.start(t); o.stop(t+0.1);
+}
+function victorySound(){ if(!sound.checked) return; const ac=ensureCtx(), notes=[880,1175,1568], now=ac.currentTime;
+  notes.forEach((f,i)=>{ const o=ac.createOscillator(), g=ac.createGain(); o.type="triangle"; o.frequency.value=f; o.connect(g); g.connect(ac.destination);
+    g.gain.setValueAtTime(0.0001, now+0.15*i); g.gain.exponentialRampToValueAtTime(0.35, now+0.15*i+0.03); g.gain.exponentialRampToValueAtTime(0.0001, now+0.15*i+0.25);
+    o.start(now+0.15*i); o.stop(now+0.15*i+0.27); });
+}
+
+/* CONSTRUCTION */
+let STATE={};
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[a[i],a[j]]=[a[j],a[i]]}return a}
+
+function makeGrid(){
+  const lg=lang.value, cont=continent.value, N=+size.value, allowDiag=diag.checked, allowRev=rev.checked, maxW=+wordsRange.value;
+  grid.style.setProperty("--N",N); grid.innerHTML=""; wordsEl.innerHTML="";
+  const pool=DATA[lg][cont].slice(); const wordsList=shuffle(pool).slice(0,Math.min(maxW,pool.length));
+  const norm=w=> lg==="ar"? w.replace(/\s|_/g,"") : w.replace(/\s|_|-/g,"").toUpperCase();
+  const place=wordsList.map(t=>({label:t,norm:norm(t)}));
+
+  const M=Array.from({length:N},()=>Array(N).fill(""));
+  const cellsPos={};
+  const dirs = allowDiag? [[1,0],[0,1],[1,1],[1,-1],[-1,1],[0,-1],[-1,0],[-1,-1]] : [[1,0],[0,1],[0,-1],[-1,0]];
+
+  function can(word,r,c,dr,dc){
+    for(let i=0;i<word.length;i++){
+      const rr=r+i*dr, cc=c+i*dc;
+      if(rr<0||cc<0||rr>=N||cc>=N) return false;
+      const ch=M[rr][cc]; if(ch && ch!==word[i]) return false;
+    } return true;
+  }
+  function put(word,r,c,dr,dc,key){
+    const pos=[]; for(let i=0;i<word.length;i++){const rr=r+i*dr,cc=c+i*dc; M[rr][cc]=word[i]; pos.push([rr,cc]);}
+    cellsPos[key]=pos;
+  }
+  for(const w of place){
+    let word=w.norm; if(allowRev && Math.random()<.5) word=[...word].reverse().join("");
+    let ok=false, tries=0;
+    while(!ok && tries<600){
+      tries++; const [dr,dc]=dirs[(Math.random()*dirs.length)|0]; const r=(Math.random()*N)|0, c=(Math.random()*N)|0;
+      if(can(word,r,c,dr,dc)){ put(word,r,c,dr,dc,w.label); ok=true; }
+    }
+  }
+
+  const letters=LETTERS[lg];
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++) if(!M[r][c]) M[r][c]=letters[(Math.random()*letters.length)|0];
+
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+    const d=document.createElement("div"); d.className="cell"; d.dataset.r=r; d.dataset.c=c; d.textContent=M[r][c]; grid.appendChild(d);
+  }
+
+  Object.keys(cellsPos).forEach(w=>{const chip=document.createElement("div"); chip.className="chip"; chip.dataset.word=w; chip.textContent=w; wordsEl.appendChild(chip);});
+
+  const t=titleBy[lg][cont]; const lgName={fr:"Français",en:"English",es:"Español",ar:"العربية"}[lg]; titleBar.textContent=`${t} — ${lgName}`;
+
+  STATE={N,M,cellsPos,found:new Set(),start:null,selecting:false,lang:lg};
+  bindSelection();
+}
+
+/* SÉLECTION tactile/souris */
+function getCell(r,c){return grid.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`)}
+function clearSel(){grid.querySelectorAll(".cell.sel").forEach(el=>el.classList.remove("sel"))}
+function paintPath(r0,c0,r1,c1){
+  clearSel();
+  const dr=Math.sign(r1-r0), dc=Math.sign(c1-c0);
+  if(!(dr===0||dc===0||Math.abs(r1-r0)===Math.abs(c1-c0))) return;
+  const steps=Math.max(Math.abs(r1-r0),Math.abs(c1-c0));
+  for(let i=0;i<=steps;i++){const rr=r0+i*dr,cc=c0+i*dc; getCell(rr,cc).classList.add("sel");}
+}
+function finalizePath(){
+  const path=[...grid.querySelectorAll(".cell.sel")]; if(path.length<2){clearSel(); return;}
+  let matched=null;
+  for(const [label,pos] of Object.entries(STATE.cellsPos)){
+    if(pos.length!==path.length) continue;
+    let ok=true; for(let i=0;i<pos.length;i++){const [r,c]=pos[i]; if(!(+path[i].dataset.r===r && +path[i].dataset.c===c)){ok=false;break}}
+    if(ok){matched=label; break;}
+    ok=true; for(let i=0;i<pos.length;i++){const [r,c]=pos[pos.length-1-i]; if(!(+path[i].dataset.r===r && +path[i].dataset.c===c)){ok=false;break}}
+    if(ok){matched=label; break;}
+  }
+  if(matched){
+    path.forEach(el=>{el.classList.remove("sel"); el.classList.add("ok");});
+    const chip=wordsEl.querySelector(`.chip[data-word="${CSS.escape(matched)}"]`); if(chip) chip.classList.add("ok");
+    STATE.found.add(matched);
+    clickSound();
+    checkWin();
+  }else clearSel();
+}
+function cellFromPoint(x,y){
+  const el=document.elementFromPoint(x,y);
+  if(!el) return null;
+  if(el.classList.contains("cell")) return el;
+  return el.closest?.(".cell")||null;
+}
+function bindSelection(){
+  const onMove = (e)=>{
+    const p = e.touches? e.touches[0] : e;
+    const hit = cellFromPoint(p.clientX, p.clientY);
+    if(!STATE.selecting || !hit) return;
+    paintPath(STATE.start[0], STATE.start[1], +hit.dataset.r, +hit.dataset.c);
+  };
+  grid.onpointerdown = (e)=>{
+    const el=e.target.closest(".cell"); if(!el) return;
+    e.preventDefault(); grid.setPointerCapture?.(e.pointerId);
+    STATE.selecting=true; STATE.start=[+el.dataset.r,+el.dataset.c];
+    clearSel(); el.classList.add("sel");
+    grid.addEventListener("pointermove", onMove, {passive:false});
+    grid.addEventListener("touchmove", onMove, {passive:false});
+  };
+  const end = (e)=>{
+    if(!STATE.selecting) return;
+    STATE.selecting=false;
+    grid.releasePointerCapture?.(e.pointerId);
+    grid.removeEventListener("pointermove", onMove);
+    grid.removeEventListener("touchmove", onMove);
+    const p = e.changedTouches? e.changedTouches[0] : e;
+    const hit = cellFromPoint(p.clientX, p.clientY);
+    if(hit) paintPath(STATE.start[0], STATE.start[1], +hit.dataset.r, +hit.dataset.c);
+    finalizePath();
+  };
+  grid.onpointerup=end; grid.ontouchend=end; grid.onpointercancel=end;
+}
+
+/* Victoire */
+function confetti(){
+  for(let i=0;i<40;i++){
+    const s=document.createElement("span");
+    s.textContent=["🎉","✨","🎊","⭐","💫"][i%5];
+    s.style.position="fixed"; s.style.left=Math.random()*100+"vw"; s.style.top="-10px";
+    s.style.fontSize=(16+Math.random()*18)+"px"; s.style.transition="transform 1.2s ease, opacity 1.3s ease"; s.style.opacity="0";
+    document.body.appendChild(s);
+    requestAnimationFrame(()=>{ s.style.opacity="1"; s.style.transform=`translateY(${(100+Math.random()*120)}vh) rotate(${(Math.random()*720-360)|0}deg)`;});
+    setTimeout(()=>s.remove(),1400);
+  }
+}
+function checkWin(){ const total=Object.keys(STATE.cellsPos).length;
+  if(STATE.found.size===total && total>0){ confetti(); victorySound(); }
+}
+
+/* Solutions */
+let showSolutions=false;
+solBtn.addEventListener("click",()=>{
+  showSolutions=!showSolutions;
+  solBtn.textContent = showSolutions ? "Masquer les solutions" : "Afficher les solutions";
+  grid.querySelectorAll(".cell").forEach(el=>el.classList.remove("sol"));
+  if(showSolutions){
+    for(const pos of Object.values(STATE.cellsPos)){
+      pos.forEach(([r,c])=> grid.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`).classList.add("sol"));
+    }
+  }
+});
+
+/* Init */
+document.getElementById("new").addEventListener("click", makeGrid);
+document.getElementById("wordsCountLabel").textContent=document.getElementById("wordsCount").value;
+makeGrid();
+</script>
+</body>
+</html>
