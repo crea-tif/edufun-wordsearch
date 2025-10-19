@@ -1,0 +1,1 @@
+Place Tajawal.woff2 here for offline Arabic. The app already references assets/fonts/Tajawal.woff2
