@@ -1,31 +1,19 @@
 /* NOTE: Les polices sont chargées via index.html (preload + @font-face).
    On ne redéclare rien ici pour éviter les 404 et les doublons. */
 
-/* Palette & base */
 :root{
   --latin: system-ui,-apple-system,'Segoe UI',Roboto,Inter,Arial,sans-serif;
   --bg:#0b1220; --ink:#e6f0ff; --muted:#94a3b8; --card:#0f172a; --line:#1f2a44; --accent:#0ea5e9; --ok:#16a34a;
 }
 
-html,body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:var(--latin);
-  min-height:100%;
-}
+html,body{ margin:0; background:var(--bg); color:var(--ink); font-family:var(--latin); min-height:100%; }
 
-/* Quand la page est en arabe ou en RTL, on utilise Noto Kufi Arabic (défini dans index.html) */
 :lang(ar), [dir="rtl"], .ar { font-family:'Noto Kufi Arabic', var(--latin); }
 
-/* Forcer latin si besoin */
 .latin{ font-family:var(--latin); }
 
-/* UI */
-.topbar{
-  position:sticky; top:0; z-index:10; display:flex; gap:12px; align-items:center;
-  padding:10px 16px; background:#0a1222; border-bottom:1px solid var(--line);
-}
+.topbar{ position:sticky; top:0; z-index:10; display:flex; gap:12px; align-items:center;
+  padding:10px 16px; background:#0a1222; border-bottom:1px solid var(--line); }
 .topbar .muted{ color:var(--muted); font-size:14px; }
 .wrap{ max-width:1100px; margin:auto; padding:18px; }
 .card{ background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; }
