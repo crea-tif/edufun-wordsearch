@@ -1,30 +1,67 @@
-/* SW — merged PWA */
-const CACHE_VERSION='v8.0.0';
-const CORE_CACHE=`edufun-core-${CACHE_VERSION}`;
-const CORE_ASSETS=[
-  './index.html','./manifest.webmanifest',
-  './assets/css/noto-ar.css','./assets/css/app.css',
-  './assets/js/app.js',
-  './assets/icons/icon-192.png','./assets/icons/icon-512.png'
-];
-self.addEventListener('install',e=>{
-  e.waitUntil(caches.open(CORE_CACHE).then(c=>c.addAll(CORE_ASSETS)).then(()=>self.skipWaiting()));
+// sw.js — PWA EDUFUN
+const CACHE_VERSION = 'v1.0.0';
+const RUNTIME_CACHE = `runtime-${CACHE_VERSION}`;
+
+self.addEventListener('install', (event) => {
+  // On active directement la nouvelle version
+  self.skipWaiting();
 });
-self.addEventListener('activate',e=>{
-  e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('edufun-core-')&&k!==CORE_CACHE).map(k=>caches.delete(k))))
-  .then(()=>self.clients.claim()));
+
+self.addEventListener('activate', (event) => {
+  // Nettoyage des anciens caches
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(
+      keys
+        .filter((k) => k !== RUNTIME_CACHE)
+        .map((k) => caches.delete(k))
+    );
+    await self.clients.claim();
+  })());
 });
-self.addEventListener('fetch',e=>{
-  const req=e.request, url=new URL(req.url);
-  if(url.origin!==self.location.origin) return;
-  if(req.destination==='font'||url.pathname.includes('/assets/fonts/')){
-    e.respondWith(caches.open('edufun-fonts').then(cache=>cache.match(req).then(r=>r||fetch(req).then(n=>{if(n.ok) cache.put(req,n.clone()); return n;}))));
+
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  const url = new URL(req.url);
+
+  // On ne gère que les requêtes GET
+  if (req.method !== 'GET') return;
+
+  // Politique Network-first pour documents HTML (meilleure mise à jour)
+  if (req.destination === 'document' || req.headers.get('accept')?.includes('text/html')) {
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(req);
+        // Mettre à jour le cache en arrière-plan
+        const cache = await caches.open(RUNTIME_CACHE);
+        cache.put(req, fresh.clone());
+        return fresh;
+      } catch (e) {
+        const cache = await caches.open(RUNTIME_CACHE);
+        const cached = await cache.match(req, { ignoreSearch: true });
+        if (cached) return cached;
+        // secours : essayer l'index
+        return cache.match('./');
+      }
+    })());
     return;
   }
-  e.respondWith((async()=>{
-    const cache=await caches.open(CORE_CACHE);
-    const cached=await cache.match(req);
-    const network=fetch(req).then(r=>{ if(r&&r.ok) cache.put(req,r.clone()); return r; }).catch(()=>cached);
-    return cached||network;
+
+  // Cache-first pour le reste (CSS, JS, images, polices…)
+  event.respondWith((async () => {
+    const cache = await caches.open(RUNTIME_CACHE);
+    const cached = await cache.match(req);
+    if (cached) return cached;
+    try {
+      const fresh = await fetch(req);
+      // on ne met en cache que les réponses valides
+      if (fresh && fresh.status === 200 && fresh.type !== 'opaque') {
+        cache.put(req, fresh.clone());
+      }
+      return fresh;
+    } catch (e) {
+      // offline sans cache => laisse échouer
+      return new Response('', { status: 504, statusText: 'offline' });
+    }
   })());
 });
