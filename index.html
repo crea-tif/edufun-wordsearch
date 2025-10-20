@@ -6,33 +6,35 @@
   <meta name="theme-color" content="#0b1620" />
 
   <!-- PWA -->
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./assets/icons/icon-512.png">
+  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png" />
+
   <!-- POLICES — utilisation des fichiers locaux dans /fonts/ -->
-<link rel="preload" href="./fonts/NotoKufiArabic-Regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="./fonts/NotoKufiArabic-Bold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./fonts/NotoKufiArabic-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./fonts/NotoKufiArabic-Bold.woff2" as="font" type="font/woff2" crossorigin>
 
-<style>
-@font-face{
-  font-family:"Noto Kufi Arabic";
-  src:url("./fonts/NotoKufiArabic-Regular.woff2") format("woff2");
-  font-weight:400; font-style:normal; font-display:swap;
-}
-@font-face{
-  font-family:"Noto Kufi Arabic";
-  src:url("./fonts/NotoKufiArabic-Bold.woff2") format("woff2");
-  font-weight:700; font-style:normal; font-display:swap;
-}
-/* Active cette police uniquement pour l'UI quand langue = arabe */
-html[lang="ar"], [dir="rtl"], :lang(ar){
-  font-family:"Noto Kufi Arabic", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
-}
-</style>
-
+  <style>
+  @font-face{
+    font-family:"Noto Kufi Arabic";
+    src:url("./fonts/NotoKufiArabic-Regular.woff2") format("woff2");
+    font-weight:400; font-style:normal; font-display:swap;
+  }
+  @font-face{
+    font-family:"Noto Kufi Arabic";
+    src:url("./fonts/NotoKufiArabic-Bold.woff2") format("woff2");
+    font-weight:700; font-style:normal; font-display:swap;
+  }
+  /* Activer la police uniquement pour l'UI arabe / RTL */
+  html[lang="ar"], [dir="rtl"], :lang(ar){
+    font-family:"Noto Kufi Arabic", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   }
   </style>
 
-  <!-- CSS (veille à ce que noto-ar.css n'écrase pas les chemins ci-dessus) -->
-  <link rel="stylesheet" href="assets/css/noto-ar.css" />
-  <link rel="stylesheet" href="assets/css/app.css" />
+  <!-- CSS appli -->
+  <!-- (noto-ar.css est vide, on ne le charge plus) -->
+  <link rel="stylesheet" href="./assets/css/app.css" />
 
   <title>EDUFUN — WordSearch Mini</title>
 
@@ -92,16 +94,19 @@ html[lang="ar"], [dir="rtl"], :lang(ar){
     .cont-oceania{--cell-sel:#13b5b1}
 
     @media (max-width:560px){ .controls{grid-template-columns:1fr} }
+
+    /* Bouton Installer (PWA) minimal */
+    #installBtn[hidden]{display:none}
+    #installBtn{margin:6px 0 0 0}
   </style>
 
   <script>
-    // Enregistrement du Service Worker (portée = dossier du site GitHub Pages)
+    // Service Worker (portée = dossier du site GitHub Pages)
     if ('serviceWorker' in navigator) {
       addEventListener('load', async () => {
         try {
           const reg = await navigator.serviceWorker.register('./sw.js');
           await navigator.serviceWorker.ready;
-          // reg.active?.postMessage({type:'ping'});
         } catch (e) {
           console.warn(e);
         }
@@ -146,7 +151,8 @@ html[lang="ar"], [dir="rtl"], :lang(ar){
       <div class="row">
         <label><input type="checkbox" id="sound" checked> son (click)</label>
       </div>
-      <div class="row"><label>Mots :</label>
+      <div class="row">
+        <label>Mots :</label>
         <input id="wordsCount" type="range" min="4" max="24" value="20">
         <span id="wordsCountLabel">20</span>
       </div>
@@ -155,6 +161,8 @@ html[lang="ar"], [dir="rtl"], :lang(ar){
     <div class="actions">
       <button id="new">Nouvelle grille</button>
       <button id="toggleSol">Afficher les solutions</button>
+      <!-- Bouton Install PWA (affiché seulement si installable) -->
+      <button id="installBtn" hidden>Installer l'application</button>
     </div>
 
     <div id="titleBar" class="header-bar">—</div>
@@ -196,18 +204,11 @@ const DATA = {
       south_america:["البرازيل","الأرجنتين","تشيلي","بيرو","الأوروغواي","باراغواي","كولومبيا"],
       oceania:["أستراليا","نيوزيلندا","فيجي","ساموا","تونغا","كيريباتي"]}
 };
-const LETTERS={
-  fr:"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-  en:"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-  es:"ABCDEFGHIJKLMNÑOPQRSTUVWXYZ",
-  ar:"ابتثجحخدذرزسشصضطظعغفقكلمنهوي"
-};
-const titleBy={
-  fr:{africa:"Afrique",europe:"Europe",asia:"Asie",north_america:"Amérique du Nord",south_america:"Amérique du Sud",oceania:"Océanie"},
-  en:{africa:"Africa",europe:"Europe",asia:"Asia",north_america:"North America",south_america:"South America",oceania:"Oceania"},
-  es:{africa:"África",europe:"Europa",asia:"Asia",north_america:"América del Norte",south_america:"América del Sur",oceania:"Oceanía"},
-  ar:{africa:"إفريقيا",europe:"أوروبا",asia:"آسيا",north_america:"أمريكا الشمالية",south_america:"أمريكا الجنوبية",oceania:"أوقيانوسيا"}
-};
+const LETTERS={fr:"ABCDEFGHIJKLMNOPQRSTUVWXYZ",en:"ABCDEFGHIJKLMNOPQRSTUVWXYZ",es:"ABCDEFGHIJKLMNÑOPQRSTUVWXYZ",ar:"ابتثجحخدذرزسشصضطظعغفقكلمنهوي"};
+const titleBy={fr:{africa:"Afrique",europe:"Europe",asia:"Asie",north_america:"Amérique du Nord",south_america:"Amérique du Sud",oceania:"Océanie"},
+              en:{africa:"Africa",europe:"Europe",asia:"Asia",north_america:"North America",south_america:"South America",oceania:"Oceania"},
+              es:{africa:"África",europe:"Europa",asia:"Asia",north_america:"América del Norte",south_america:"América del Sur",oceania:"Oceanía"},
+              ar:{africa:"إفريقيا",europe:"أوروبا",asia:"آسيا",north_america:"أمريكا الشمالية",south_america:"أمريكا الجنوبية",oceania:"أوقيانوسيا"}};
 
 const $=s=>document.querySelector(s);
 const grid=$("#grid"), wordsEl=$("#words"), titleBar=$("#titleBar");
@@ -217,10 +218,7 @@ const sound=$("#sound");
 wordsRange.addEventListener("input",()=>wordsLabel.textContent=wordsRange.value);
 
 /* Langue & direction */
-function syncDir(){
-  document.body.dir = (lang.value==="ar") ? "rtl" : "ltr";
-  document.documentElement.lang = lang.value;
-}
+function syncDir(){ document.body.dir = (lang.value==="ar")?"rtl":"ltr"; document.documentElement.lang = lang.value; }
 lang.addEventListener("change",syncDir); syncDir();
 
 /* Accent par continent */
@@ -267,8 +265,7 @@ function makeGrid(){
 
   const M=Array.from({length:N},()=>Array(N).fill(""));
   const cellsPos={};
-  const dirs = allowDiag? [[1,0],[0,1],[1,1],[1,-1],[-1,1],[0,-1],[-1,0],[-1,-1]]
-                        : [[1,0],[0,1],[0,-1],[-1,0]];
+  const dirs = allowDiag? [[1,0],[0,1],[1,1],[1,-1],[-1,1],[0,-1],[-1,0],[-1,-1]] : [[1,0],[0,1],[0,-1],[-1,0]];
 
   function can(word,r,c,dr,dc){
     for(let i=0;i<word.length;i++){
@@ -399,6 +396,26 @@ document.getElementById("toggleSol").addEventListener("click",()=>{
       pos.forEach(([r,c])=> grid.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`).classList.add("sol"));
     }
   }
+});
+
+/* Bouton Installer (PWA) */
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const btn = document.getElementById('installBtn');
+  if (btn) btn.hidden = false;
+});
+document.getElementById('installBtn')?.addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  const btn = document.getElementById('installBtn');
+  if (btn) btn.hidden = true;
+  await deferredPrompt.prompt();
+  try { await deferredPrompt.userChoice; } finally { deferredPrompt = null; }
+});
+window.addEventListener('appinstalled', () => {
+  const btn = document.getElementById('installBtn');
+  if (btn) btn.hidden = true;
 });
 
 /* Init */
