@@ -3,55 +3,29 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>EDUFUN — WordSearch Mini</title>
+  <meta name="theme-color" content="#0b1620" />
 
-  <!-- Couleur de thème + PWA -->
-  <meta name="theme-color" content="#0b1b2b" />
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-  <!-- Manifest (nom FR déjà présent dans ton repo) -->
-  <link rel="manifest" href="./manifeste.webmanifest" />
-
-  <!-- Icônes -->
-  <link rel="icon" sizes="192x192" href="assets/icons/icon-192.png" />
-  <link rel="icon" sizes="512x512" href="assets/icons/icon-512.png" />
-  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
-
-  <!-- Feuilles de style existantes -->
+  <!-- CSS (garde la police Noto Kufi Arabic dans ce fichier) -->
   <link rel="stylesheet" href="assets/css/noto-ar.css" />
   <link rel="stylesheet" href="assets/css/app.css" />
 
-  <!-- Noto Kufi Arabic OFFLINE (Regular + Bold) -->
+  <title>EDUFUN — WordSearch Mini</title>
+
   <style>
-    @font-face{
-      font-family: "Noto Kufi Arabic";
-      font-style: normal;
-      font-weight: 400;
-      font-display: swap;
-      src: url("assets/fonts/NotoKufiArabic-Regular.woff2") format("woff2");
-    }
-    @font-face{
-      font-family: "Noto Kufi Arabic";
-      font-style: normal;
-      font-weight: 700;
-      font-display: swap;
-      src: url("assets/fonts/NotoKufiArabic-Bold.woff2") format("woff2");
-    }
-
-    /* Arabe : forcer Noto Kufi Arabic ; sinon Inter/system-ui */
-    html[lang="ar"], [dir="rtl"], .ar, :lang(ar){
-      font-family: "Noto Kufi Arabic", system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
-    }
-
-    /* Thème (garde l’esthétique que tu avais) */
     :root{
       --bg:#0b1420; --panel:#0f1b2a; --ink:#e9f1ff; --muted:#a9bed8; --accent:#21c07a;
       --cell:#0a1524; --cell-sel:#1a7e4d; --cell-ok:#1aa75f; --border:#4d8ed1;
       --gap:8px; --shell-w:min(92vw,680px);
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
+    *{box-sizing:border-box} html,body{height:100%}
     body{
       margin:0; background:linear-gradient(180deg,#0b1420,#081019); color:var(--ink);
       font-family: Inter, system-ui, "Noto Kufi Arabic", sans-serif;
@@ -74,7 +48,6 @@
     #grid-wrap{width:var(--shell-w);padding:12px;border:1px solid #24496e;border-radius:14px;background:#0e1826;margin:0 auto}
     #grid{display:grid;grid-template-columns:repeat(var(--N,14),1fr);gap:var(--gap);width:100%;touch-action:none}
 
-    /* Cellules carrées + texte qui ne déborde jamais */
     .cell{
       background:var(--cell); border:1px solid var(--border);
       display:flex; align-items:center; justify-content:center;
@@ -84,7 +57,6 @@
       white-space:nowrap; overflow:hidden; letter-spacing:0; box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);
     }
     body[dir="rtl"] .cell{
-      /* un léger rabot pour l’arabe */
       font-size: clamp(13px, calc( ((var(--shell-w) - (var(--N) - 1) * var(--gap)) / var(--N)) * 0.52 ), 44px);
     }
     .cell.sel{background:var(--cell-sel);border-color:#2bd083}
@@ -95,7 +67,6 @@
     .words .chip{background:#142944;border:1px dashed #274a77;color:#d4e6ff;padding:8px 12px;border-radius:999px;font-weight:700}
     .words .chip.ok{background:#0f3b24;border-color:#1f9d55;color:#bff6d1}
 
-    /* Accent par continent */
     .cont-africa{--cell-sel:#1a7e4d}
     .cont-europe{--cell-sel:#1f6fe0}
     .cont-asia{--cell-sel:#b84ce6}
@@ -106,11 +77,11 @@
     @media (max-width:560px){ .controls{grid-template-columns:1fr} }
   </style>
 
-  <!-- Service Worker -->
   <script>
+    // Enregistrement du Service Worker (portée = dossier du site GitHub Pages)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(()=>{});
+        navigator.serviceWorker.register('./sw.js').catch(console.error);
       });
     }
   </script>
@@ -215,15 +186,15 @@ const newBtn=$("#new"), solBtn=$("#toggleSol"), wordsRange=$("#wordsCount"), wor
 const sound=$("#sound");
 wordsRange.addEventListener("input",()=>wordsLabel.textContent=wordsRange.value);
 
-/* Direction RTL quand arabe */
+/* Langue & direction */
 function syncDir(){ document.body.dir = (lang.value==="ar")?"rtl":"ltr"; document.documentElement.lang = lang.value; }
 lang.addEventListener("change",syncDir); syncDir();
 
-/* Couleur par continent */
+/* Accent par continent */
 function setAccent(){ const wrap=$("#grid-wrap"); wrap.className=""; wrap.classList.add("cont-"+continent.value); }
 continent.addEventListener("change",setAccent); setAccent();
 
-/* AUDIO */
+/* AUDIO (click & victoire) */
 let actx=null; function ensureCtx(){ if(!actx){ actx=new (window.AudioContext||window.webkitAudioContext)(); } return actx; }
 function clickSound(){ if(!sound.checked) return; const ac=ensureCtx(), o=ac.createOscillator(), g=ac.createGain();
   o.type="square"; o.frequency.value=880; o.connect(g); g.connect(ac.destination);
@@ -236,14 +207,14 @@ function victorySound(){ if(!sound.checked) return; const ac=ensureCtx(), notes=
     o.start(now+0.15*i); o.stop(now+0.15*i+0.27); });
 }
 
-/* CONSTRUCTION */
+/* Construction de la grille */
 let STATE={};
-function shuffle(a){for(let i=a.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[a[i],a[j]]=[a[j],a[i]]}return a}
+function shuffle(a){for(let i=a.length-1;i>0;i++){const j=(Math.random()*(i+1))|0;[a[i],a[j]]=[a[j],a[i]]}return a}
 
 function makeGrid(){
   const lg=lang.value, cont=continent.value;
-  const N = Number(size.value) || 14;              // garde-fou
-  const allowDiag=diag.checked, allowRev=rev.checked, maxW=Number(wordsRange.value)||20;
+  const N = Math.max(4, parseInt(size.value,10) || 14);
+  const allowDiag=diag.checked, allowRev=rev.checked, maxW=Math.max(1, parseInt(wordsRange.value,10) || 20);
 
   grid.style.setProperty("--N",N);
   grid.innerHTML=""; wordsEl.innerHTML="";
@@ -374,9 +345,10 @@ function checkWin(){ const total=Object.keys(STATE.cellsPos).length;
 
 /* Solutions */
 let showSolutions=false;
-solBtn.addEventListener("click",()=>{
+document.getElementById("toggleSol").addEventListener("click",()=>{
   showSolutions=!showSolutions;
-  solBtn.textContent = showSolutions ? "Masquer les solutions" : "Afficher les solutions";
+  const btn=document.getElementById("toggleSol");
+  btn.textContent = showSolutions ? "Masquer les solutions" : "Afficher les solutions";
   grid.querySelectorAll(".cell").forEach(el=>el.classList.remove("sol"));
   if(showSolutions){
     for(const pos of Object.values(STATE.cellsPos)){
@@ -386,8 +358,8 @@ solBtn.addEventListener("click",()=>{
 });
 
 /* Init */
-newBtn.addEventListener("click", makeGrid);
-wordsLabel.textContent = wordsRange.value;
+document.getElementById("new").addEventListener("click", makeGrid);
+document.getElementById("wordsCountLabel").textContent = document.getElementById("wordsCount").value;
 makeGrid();
 </script>
 </body>
