@@ -1,6 +1,6 @@
 {
-  "name": "EDUFUN MOTS MÊLÉS DES PAYS DU MONDE (EN ANGLAIS)",
-  "short_name": "Edufun WordSearch",
+  "name": "EDUFUN — WordSearch Countries of the World",
+"short_name": "EDUFUN WordSearch",
   "description": "Cherche des pays du monde dans une grille — version EDUFUN.",
   "start_url": "./",
   "scope": "./",
