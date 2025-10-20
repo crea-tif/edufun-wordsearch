@@ -6,32 +6,27 @@
   <meta name="theme-color" content="#0b1620" />
 
   <!-- PWA -->
-  <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png" />
-  <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png" />
-  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
-  <!-- apple-mobile-web-app-capable est déprécié : on garde mais on ajoute le pendant générique -->
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <!-- POLICES — utilisation des fichiers locaux dans /fonts/ -->
+<link rel="preload" href="./fonts/NotoKufiArabic-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="./fonts/NotoKufiArabic-Bold.woff2" as="font" type="font/woff2" crossorigin>
 
-  <!-- POLICES : Noto Kufi Arabic local (assets/fonts/...) -->
-  <link rel="preload" href="./assets/fonts/NotoKufiArabic-Regular.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="./assets/fonts/NotoKufiArabic-Bold.woff2" as="font" type="font/woff2" crossorigin>
-  <style>
-  @font-face{
-    font-family:"Noto Kufi Arabic";
-    src:url("./assets/fonts/NotoKufiArabic-Regular.woff2") format("woff2");
-    font-weight:400; font-style:normal; font-display:swap;
-  }
-  @font-face{
-    font-family:"Noto Kufi Arabic";
-    src:url("./assets/fonts/NotoKufiArabic-Bold.woff2") format("woff2");
-    font-weight:700; font-style:normal; font-display:swap;
-  }
-  /* Active cette police seulement pour AR/RTL */
-  html[lang="ar"], [dir="rtl"], :lang(ar){
-    font-family:"Noto Kufi Arabic", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+<style>
+@font-face{
+  font-family:"Noto Kufi Arabic";
+  src:url("./fonts/NotoKufiArabic-Regular.woff2") format("woff2");
+  font-weight:400; font-style:normal; font-display:swap;
+}
+@font-face{
+  font-family:"Noto Kufi Arabic";
+  src:url("./fonts/NotoKufiArabic-Bold.woff2") format("woff2");
+  font-weight:700; font-style:normal; font-display:swap;
+}
+/* Active cette police uniquement pour l'UI quand langue = arabe */
+html[lang="ar"], [dir="rtl"], :lang(ar){
+  font-family:"Noto Kufi Arabic", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+</style>
+
   }
   </style>
 
