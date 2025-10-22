@@ -6,18 +6,17 @@
   <meta name="theme-color" content="#0b1620" />
 
   <!-- PWA -->
-<link rel="manifest" href="manifest.webmanifest?v=4" />
-  <!-- Favicon / App icons -->
-<link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/edufun-logo-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="./assets/icons/edufun-logo-512.png">
-<link rel="apple-touch-icon" href="./assets/icons/edufun-logo-192.png">
-  
+  <link rel="manifest" href="manifest.webmanifest?v=4" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/edufun-logo-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./assets/icons/edufun-logo-512.png">
+  <link rel="apple-touch-icon" href="./assets/icons/edufun-logo-192.png" />
 
-  <!-- POLICES — utilisation des fichiers locaux dans /fonts/ -->
+  <!-- POLICES locales -->
   <link rel="preload" href="./fonts/NotoKufiArabic-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="./fonts/NotoKufiArabic-Bold.woff2" as="font" type="font/woff2" crossorigin>
 
   <style>
+  /* Police arabe (activée en RTL) */
   @font-face{
     font-family:"Noto Kufi Arabic";
     src:url("./fonts/NotoKufiArabic-Regular.woff2") format("woff2");
@@ -28,106 +27,130 @@
     src:url("./fonts/NotoKufiArabic-Bold.woff2") format("woff2");
     font-weight:700; font-style:normal; font-display:swap;
   }
-  /* Activer la police uniquement pour l'UI arabe / RTL */
   html[lang="ar"], [dir="rtl"], :lang(ar){
     font-family:"Noto Kufi Arabic", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   }
+
+  /* ===== Thème & UI modernisés ===== */
+  :root{
+    --bg:#1B1F38;            /* fond général (bleu nuit) */
+    --panel:#222A4A;         /* cartes/encarts */
+    --ink:#ffffff;           /* texte principal */
+    --muted:#AFC7FF;         /* texte secondaire */
+    --accent:#FFBA08;        /* boutons (jaune fun) */
+    --cell:#2D3A68;          /* case vide */
+    --cell-sel:#F72585;      /* sélection (rose) */
+    --cell-ok:#3ABF47;       /* mot trouvé (vert) */
+    --border:#4AA3FF;        /* bordure de grille */
+    --gap:8px; --shell-w:min(92vw,680px);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; color:var(--ink);
+    background: radial-gradient(1200px 1200px at 70% -200px, #20305f 0%, #1B1F38 45%, #12162a 100%);
+    font-family: Inter, system-ui, "Noto Kufi Arabic", sans-serif;
+  }
+  body[dir="rtl"]{font-family:"Noto Kufi Arabic", system-ui, sans-serif}
+
+  .container{max-width:980px;margin-inline:auto;padding:16px}
+  h1{margin:6px 0 14px;font-size:clamp(20px,3.6vw,34px);letter-spacing:.3px}
+
+  .card{
+    background: var(--panel);
+    border-radius: 18px;
+    padding: 16px;
+    box-shadow: 0 8px 28px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.04);
+  }
+
+  .controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  @media (max-width:560px){ .controls{grid-template-columns:1fr} }
+  .controls .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  label{color:var(--muted);font-size:14px}
+  select,input[type="range"]{
+    background:#0f1733;color:var(--ink);
+    border:1px solid #32447a;border-radius:10px;padding:6px 10px
+  }
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+
+  button{
+    background: var(--accent); color: #1B1F38;
+    border:0;border-radius:12px;padding:10px 16px;font-weight:900;cursor:pointer;
+    box-shadow: 0 6px 18px rgba(255,186,8,.35);
+    transition: transform .08s ease, box-shadow .2s ease, filter .2s ease;
+  }
+  button:hover{ transform: translateY(-1px); filter: saturate(1.1); }
+  button:active{ transform: translateY(0); box-shadow:none; }
+
+  .header-bar{
+    background: linear-gradient(135deg,#253062 0%, #1f2a54 50%, #1b2448 100%);
+    border-radius: 12px; padding: 10px 14px; text-align:center;
+    font-weight:800; letter-spacing:.4px; color: var(--muted);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+  }
+
+  .grid-shell{display:flex;justify-content:center}
+  #grid-wrap{
+    width:var(--shell-w); padding:12px; border:1px solid #2a3a6d; border-radius:14px;
+    background:#141d3a; box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); margin:0 auto
+  }
+  #grid{display:grid;grid-template-columns:repeat(var(--N,14),1fr);gap:var(--gap);width:100%;touch-action:none}
+
+  .cell{
+    background:var(--cell); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    color:#f1f6ff; font-weight:800; aspect-ratio:1/1;
+    font-size: clamp(14px, calc(((var(--shell-w) - (var(--N) - 1) * var(--gap)) / var(--N)) * 0.56), 48px);
+    line-height:1; user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color: transparent;
+    white-space:nowrap; overflow:hidden; letter-spacing:0;
+    border-radius:10px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+    transition: background .1s, transform .08s, box-shadow .2s, color .2s;
+  }
+  body[dir="rtl"] .cell{
+    font-size: clamp(13px, calc(((var(--shell-w) - (var(--N) - 1) * var(--gap)) / var(--N)) * 0.52), 44px);
+  }
+  .cell.sel{
+    background: var(--cell-sel); border-color: #ff4da0; color: #fff;
+    box-shadow: 0 0 0 8px rgba(247,37,133,.15), 0 0 24px rgba(124,195,255,.25) inset;
+    animation: pulseSelect .8s ease-out infinite; transform: scale(.98);
+  }
+  @keyframes pulseSelect{0%{box-shadow:0 0 0 8px rgba(247,37,133,.18)}100%{box-shadow:0 0 0 18px rgba(247,37,133,0)}}
+  .cell.ok{
+    background: var(--cell-ok); border-color:#3de58e; color:#071b0b;
+    box-shadow: 0 0 18px rgba(61,229,142,.35) inset; animation: popFound .35s ease;
+  }
+  @keyframes popFound { 0%{transform:scale(1)} 50%{transform:scale(1.12)} 100%{transform:scale(1)} }
+  .cell.sol{outline:3px dashed #ffa726;outline-offset:-6px}
+
+  .words{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;justify-content:center}
+  .words .chip{background:#16244a;border:1px dashed #2f4a8a;color:#d4e6ff;padding:8px 12px;border-radius:999px;font-weight:800}
+  .words .chip.ok{background:#0f3b24;border-color:#1f9d55;color:#bff6d1}
+
+  /* Bouton Installer */
+  #installBtn[hidden]{display:none}
+  #installBtn{margin:6px 0 0 0}
+
+  /* Canvas de célébration (feux + confettis) */
+  #celebration-canvas{position:fixed; inset:0; pointer-events:none; z-index:9999}
   </style>
 
-  <!-- CSS appli -->
-  <link rel="stylesheet" href="./assets/css/app.css" />
-
-  <title>EDUFUN — WordSearch</title>
-
-  <style>
-    :root{
-  --bg:#1B1F38;
-  --panel:#222A4A;
-  --ink:#ffffff;
-  --muted:#AFC7FF;
-  --accent:#FFBA08;
-  --cell:#2D3A68;
-  --cell-sel:#F72585;
-  --cell-ok:#3ABF47;
-  --border:#4AA3FF;
-  --gap:8px;
-  --shell-w:min(92vw,680px);
-}
-
-    *{box-sizing:border-box} html,body{height:100%}
-    body{
-      margin:0; background:linear-gradient(180deg,#0b1420,#081019); color:var(--ink);
-      font-family: Inter, system-ui, "Noto Kufi Arabic", sans-serif;
-    }
-    body[dir="rtl"]{font-family:"Noto Kufi Arabic", system-ui, sans-serif}
-
-    .container{max-width:980px;margin-inline:auto;padding:16px}
-    h1{margin:6px 0 14px;font-size:clamp(20px,3.6vw,34px)}
-    .card{background:var(--panel);border-radius:16px;padding:14px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
-
-    .controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-    .controls .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    label{color:var(--muted);font-size:14px}
-    select,input[type="range"]{background:#0b1626;color:var(--ink);border:1px solid #254c7b;border-radius:10px;padding:6px 10px}
-    button{background:var(--accent);color:#052016;border:0;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer}
-    .actions{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
-    .header-bar{background:#0d1b2c;padding:10px;border-radius:10px;text-align:center;font-weight:800}
-
-    .grid-shell{display:flex;justify-content:center}
-    #grid-wrap{width:var(--shell-w);padding:12px;border:1px solid #24496e;border-radius:14px;background:#0e1826;margin:0 auto}
-    #grid{display:grid;grid-template-columns:repeat(var(--N,14),1fr);gap:var(--gap);width:100%;touch-action:none}
-
-    .cell{
-      background:var(--cell); border:1px solid var(--border);
-      display:flex; align-items:center; justify-content:center;
-      color:#f1f6ff; font-weight:800; aspect-ratio:1/1;
-      font-size: clamp(14px, calc( ((var(--shell-w) - (var(--N) - 1) * var(--gap)) / var(--N)) * 0.56 ), 48px);
-      line-height:1; user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color: transparent;
-      white-space:nowrap; overflow:hidden; letter-spacing:0; box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);
-    }
-    body[dir="rtl"] .cell{
-      font-size: clamp(13px, calc( ((var(--shell-w) - (var(--N) - 1) * var(--gap)) / var(--N)) * 0.52 ), 44px);
-    }
-    .cell.sel{background:var(--cell-sel);border-color:#2bd083}
-    .cell.ok{background:var(--cell-ok);border-color:#3de58e;color:#fff}
-    .cell.sol{outline:3px dashed #ffa726;outline-offset:-6px}
-
-    .words{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;justify-content:center}
-    .words .chip{background:#142944;border:1px dashed #274a77;color:#d4e6ff;padding:8px 12px;border-radius:999px;font-weight:700}
-    .words .chip.ok{background:#0f3b24;border-color:#1f9d55;color:#bff6d1}
-
-    .cont-africa{--cell-sel:#1a7e4d}
-    .cont-europe{--cell-sel:#1f6fe0}
-    .cont-asia{--cell-sel:#b84ce6}
-    .cont-north_america{--cell-sel:#ff7a1a}
-    .cont-south_america{--cell-sel:#ff4d6d}
-    .cont-oceania{--cell-sel:#13b5b1}
-
-    @media (max-width:560px){ .controls{grid-template-columns:1fr} }
-
-    /* Bouton Installer (PWA) minimal */
-    #installBtn[hidden]{display:none}
-    #installBtn{margin:6px 0 0 0}
-  </style>
+  <title>EDUFUN — WordSearch Mini</title>
 
   <script>
-    // Service Worker (portée = dossier du site GitHub Pages)
+    // Service Worker
     if ('serviceWorker' in navigator) {
       addEventListener('load', async () => {
         try {
           const reg = await navigator.serviceWorker.register('./sw.js');
           await navigator.serviceWorker.ready;
-        } catch (e) {
-          console.warn(e);
-        }
+        } catch (e) { console.warn(e); }
       });
     }
   </script>
 </head>
 <body>
 <div class="container">
-  <h1>🌍 EDUFUN — WordSearch</h1>
-
+  <h1>🌍 EDUFUN — WordSearch Mini</h1>
 
   <div class="card">
     <div class="controls">
@@ -172,7 +195,6 @@
     <div class="actions">
       <button id="new">Nouvelle grille</button>
       <button id="toggleSol">Afficher les solutions</button>
-      <!-- Bouton Install PWA (affiché seulement si installable) -->
       <button id="installBtn" hidden>Installer l'application</button>
     </div>
 
@@ -232,11 +254,11 @@ wordsRange.addEventListener("input",()=>wordsLabel.textContent=wordsRange.value)
 function syncDir(){ document.body.dir = (lang.value==="ar")?"rtl":"ltr"; document.documentElement.lang = lang.value; }
 lang.addEventListener("change",syncDir); syncDir();
 
-/* Accent par continent */
+/* Accent par continent (si vous voulez changer des teintes à l’avenir) */
 function setAccent(){ const wrap=$("#grid-wrap"); wrap.className=""; wrap.classList.add("cont-"+continent.value); }
 continent.addEventListener("change",setAccent); setAccent();
 
-/* AUDIO (click & victoire) */
+/* AUDIO */
 let actx=null; function ensureCtx(){ if(!actx){ actx=new (window.AudioContext||window.webkitAudioContext)(); } return actx; }
 function clickSound(){ if(!sound.checked) return; const ac=ensureCtx(), o=ac.createOscillator(), g=ac.createGain();
   o.type="square"; o.frequency.value=880; o.connect(g); g.connect(ac.destination);
@@ -249,6 +271,69 @@ function victorySound(){ if(!sound.checked) return; const ac=ensureCtx(), notes=
     o.start(now+0.15*i); o.stop(now+0.15*i+0.27); });
 }
 
+/* ===== Festivités XXL ===== */
+let fwCanvas, fwCtx, fwRaf;
+function ensureFireCanvas(){
+  if (fwCanvas) return;
+  fwCanvas = document.createElement('canvas');
+  fwCanvas.id = 'celebration-canvas';
+  document.body.appendChild(fwCanvas);
+  fwCtx = fwCanvas.getContext('2d');
+  const resize = ()=>{ fwCanvas.width = window.innerWidth; fwCanvas.height = window.innerHeight; };
+  window.addEventListener('resize', resize); resize();
+}
+function spawnParticles(x, y, color, count=70, speed=6){
+  const parts = [];
+  for (let i=0;i<count;i++){
+    const a = Math.random()*Math.PI*2;
+    const v = (0.5+Math.random())*speed;
+    parts.push({x, y, vx:Math.cos(a)*v, vy:Math.sin(a)*v-(Math.random()*2), life:60+Math.random()*40, r:2+Math.random()*3, color});
+  }
+  return parts;
+}
+function runFireworks(){
+  ensureFireCanvas();
+  const ctx = fwCtx, W = fwCanvas.width, H = fwCanvas.height;
+  let particles = [];
+  const colors = ['#FFBA08','#F72585','#3ABF47','#4AA3FF','#FB5607','#B5179E'];
+  for (let k=0;k<3;k++){
+    const cx = Math.random()*W*0.8 + W*0.1;
+    const cy = Math.random()*H*0.4 + H*0.1;
+    const col = colors[(Math.random()*colors.length)|0];
+    particles.push(...spawnParticles(cx, cy, col, 120, 7));
+  }
+  for (let i=0;i<250;i++){
+    const x = Math.random()*W, y = -20*Math.random();
+    const col = colors[i % colors.length];
+    particles.push({x,y,vx:(Math.random()*2-1)*1.5,vy:2+Math.random()*3,life:120+Math.random()*80,r:2+Math.random()*2,color:col});
+  }
+  cancelAnimationFrame(fwRaf);
+  function tick(){
+    fwRaf = requestAnimationFrame(tick);
+    ctx.clearRect(0,0,W,H);
+    particles.forEach(p=>{
+      p.x += p.vx; p.y += p.vy; p.vy += 0.06; p.vx *= 0.995; p.life -= 1;
+      ctx.save(); ctx.globalAlpha = Math.max(0, p.life/150); ctx.fillStyle = p.color;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill(); ctx.restore();
+    });
+    particles = particles.filter(p=>p.life>0 && p.y < H+50);
+    if (!particles.length) cancelAnimationFrame(fwRaf);
+  }
+  tick();
+}
+function bigVictoryJingle(){
+  if(!sound.checked) return;
+  const ac = ensureCtx(); const base = ac.currentTime;
+  const notes = [523,659,784,1046,880,988,1175];
+  notes.forEach((f,i)=>{
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type='sine'; o.frequency.value=f; o.connect(g); g.connect(ac.destination);
+    const t = base + i*0.12; g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(0.35,t+0.03); g.gain.exponentialRampToValueAtTime(0.0001,t+0.28);
+    o.start(t); o.stop(t+0.3);
+  });
+}
+
 /* Utils */
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
 const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -259,7 +344,7 @@ let STATE={};
 function makeGrid(){
   const lg=(lang?.value||'fr').toLowerCase();
   const cont=continent?.value||'africa';
-  const N   = clamp(parseInt(size?.value,10)||14, 4, 24);
+  const N = clamp(parseInt(size?.value,10)||14, 4, 24);
   const allowDiag=!!diag?.checked, allowRev=!!rev?.checked;
   const maxW= clamp(parseInt(wordsRange?.value,10)||20, 4, 50);
 
@@ -367,8 +452,7 @@ function bindSelection(){
   };
   const end = (e)=>{
     if(!STATE.selecting) return;
-    STATE.selecting=false;
-    grid.releasePointerCapture?.(e.pointerId);
+    STATE.selecting=false; grid.releasePointerCapture?.(e.pointerId);
     grid.removeEventListener("pointermove", onMove);
     grid.removeEventListener("touchmove", onMove);
     const p = e.changedTouches? e.changedTouches[0] : e;
@@ -379,20 +463,18 @@ function bindSelection(){
   grid.onpointerup=end; grid.ontouchend=end; grid.onpointercancel=end;
 }
 
-/* Victoire */
-function confetti(){
-  for(let i=0;i<40;i++){
-    const s=document.createElement("span");
-    s.textContent=["🎉","✨","🎊","⭐","💫"][i%5];
-    s.style.position="fixed"; s.style.left=Math.random()*100+"vw"; s.style.top="-10px";
-    s.style.fontSize=(16+Math.random()*18)+"px"; s.style.transition="transform 1.2s ease, opacity 1.3s ease"; s.style.opacity="0";
-    document.body.appendChild(s);
-    requestAnimationFrame(()=>{ s.style.opacity="1"; s.style.transform=`translateY(${(100+Math.random()*120)}vh) rotate(${(Math.random()*720-360)|0}deg)`;});
-    setTimeout(()=>s.remove(),1400);
+/* Victoire (version upgrade) */
+function checkWin(){
+  const total = Object.keys(STATE.cellsPos).length;
+  if (STATE._won) return;
+  if(STATE.found.size===total && total>0){
+    STATE._won = true;
+    // ancien confetti texte si besoin : // confetti();
+    victorySound();
+    bigVictoryJingle();
+    runFireworks();
+    setTimeout(()=>{ STATE._won=false; }, 2500);
   }
-}
-function checkWin(){ const total=Object.keys(STATE.cellsPos).length;
-  if(STATE.found.size===total && total>0){ confetti(); victorySound(); }
 }
 
 /* Solutions */
