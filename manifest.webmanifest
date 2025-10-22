@@ -10,7 +10,7 @@
   "theme_color": "#0b1620",
   "background_color": "#0b1620",
   "icons": [
-    { "src": "assets/icons/edufun-logo-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "assets/icons/edufun-logo-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "actifs/icônes/edufun-logo-192.png", "sizes": "192x192", "type": "image/png", "provides": "any maskable" },
+    { "src": "actifs/icônes/edufun-logo-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ]
 }
