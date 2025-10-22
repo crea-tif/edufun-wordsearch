@@ -4,8 +4,8 @@ const ASSETS = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./actifs/icônes/edufun-logo-192.png",
-  "./actifs/icônes/edufun-logo-512.png"
+  "./actifs/icons/edufun-logo-192.png",
+  "./actifs/icons/edufun-logo-512.png"
 ];
 
 self.addEventListener("install", (e) => {
