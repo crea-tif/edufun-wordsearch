@@ -1,5 +1,6 @@
 {
-  "name": "EDUFUN — WordSearch",
+  "id": "./",
+  "name": "EDUFUN",
   "short_name": "EDUFUN",
   "description": "Cherche des pays du monde dans une grille — version EDUFUN.",
   "start_url": "./",
