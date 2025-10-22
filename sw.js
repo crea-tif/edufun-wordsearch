@@ -1,11 +1,11 @@
-// sw.js — scope = racine si tu l’enregistres via "./sw.js"
+// sw.js
 const CACHE = "edufun-v1";
 const ASSETS = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./actifs/icons/edufun-logo-192.png",
-  "./actifs/icons/edufun-logo-512.png"
+  "./assets/icons/edufun-logo-192.png",
+  "./assets/icons/edufun-logo-512.png"
 ];
 
 self.addEventListener("install", (e) => {
@@ -24,8 +24,14 @@ self.addEventListener("activate", (e) => {
 
 self.addEventListener("fetch", (e) => {
   const req = e.request;
-  // Cache-first pour assets statiques
-  if (req.method === "GET" && (req.destination === "document" || req.destination === "image" || req.destination === "style" || req.destination === "script" || req.destination === "manifest")) {
+  if (
+    req.method === "GET" &&
+    (req.destination === "document" ||
+     req.destination === "image" ||
+     req.destination === "style" ||
+     req.destination === "script" ||
+     req.destination === "manifest")
+  ) {
     e.respondWith(
       caches.match(req).then(r => r || fetch(req).then(res => {
         const copy = res.clone();
