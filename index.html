@@ -6,132 +6,74 @@
   <meta name="theme-color" content="#0b1620">
 
   <!-- PWA -->
-  <link rel="manifest" href="manifest.webmanifest?v=8">
-<link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/edufun-logo-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="./assets/icons/edufun-logo-512.png">
-<link rel="apple-touch-icon" href="./assets/icons/edufun-logo-192.png">
+  <link rel="manifest" href="manifest.webmanifest?v=9">
+  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/edufun-logo-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./assets/icons/edufun-logo-512.png">
+  <link rel="apple-touch-icon" href="./assets/icons/edufun-logo-192.png">
 
   <!-- POLICES locales -->
   <link rel="preload" href="./fonts/NotoKufiArabic-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="./fonts/NotoKufiArabic-Bold.woff2" as="font" type="font/woff2" crossorigin>
 
   <style>
-  /* Police arabe (activée en RTL) */
-  @font-face{
-    font-family:"Noto Kufi Arabic";
-    src:url("./fonts/NotoKufiArabic-Regular.woff2") format("woff2");
-    font-weight:400; font-style:normal; font-display:swap;
-  }
-  @font-face{
-    font-family:"Noto Kufi Arabic";
-    src:url("./fonts/NotoKufiArabic-Bold.woff2") format("woff2");
-    font-weight:700; font-style:normal; font-display:swap;
-  }
-  html[lang="ar"], [dir="rtl"], :lang(ar){
-    font-family:"Noto Kufi Arabic", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
-  }
+  @font-face{font-family:"Noto Kufi Arabic";src:url("./fonts/NotoKufiArabic-Regular.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+  @font-face{font-family:"Noto Kufi Arabic";src:url("./fonts/NotoKufiArabic-Bold.woff2") format("woff2");font-weight:700;font-style:normal;font-display:swap}
+  html[lang="ar"], [dir="rtl"], :lang(ar){font-family:"Noto Kufi Arabic",system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
 
-  /* ===== Thème & UI modernisés ===== */
   :root{
-    --bg:#1B1F38;            /* fond général (bleu nuit) */
-    --panel:#222A4A;         /* cartes/encarts */
-    --ink:#ffffff;           /* texte principal */
-    --muted:#AFC7FF;         /* texte secondaire */
-    --accent:#FFBA08;        /* boutons (jaune fun) */
-    --cell:#2D3A68;          /* case vide */
-    --cell-sel:#F72585;      /* sélection (rose) */
-    --cell-ok:#3ABF47;       /* mot trouvé (vert) */
-    --border:#4AA3FF;        /* bordure de grille */
+    --bg:#1B1F38; --panel:#222A4A; --ink:#fff; --muted:#AFC7FF; --accent:#FFBA08;
+    --cell:#2D3A68; --cell-sel:#F72585; --cell-ok:#3ABF47; --border:#4AA3FF;
     --gap:8px; --shell-w:min(92vw,680px);
   }
   *{box-sizing:border-box}
   html,body{height:100%}
-  body{
-    margin:0; color:var(--ink);
-    background: radial-gradient(1200px 1200px at 70% -200px, #20305f 0%, #1B1F38 45%, #12162a 100%);
-    font-family: Inter, system-ui, "Noto Kufi Arabic", sans-serif;
-  }
-  body[dir="rtl"]{font-family:"Noto Kufi Arabic", system-ui, sans-serif}
+  body{margin:0;color:var(--ink);background:radial-gradient(1200px 1200px at 70% -200px,#20305f 0%,#1B1F38 45%,#12162a 100%);font-family:Inter,system-ui,"Noto Kufi Arabic",sans-serif}
+  body[dir="rtl"]{font-family:"Noto Kufi Arabic",system-ui,sans-serif}
 
   .container{max-width:980px;margin-inline:auto;padding:16px}
-  h1{margin:6px 0 14px;font-size:clamp(20px,3.6vw,34px);letter-spacing:.3px}
 
-  .card{
-    background: var(--panel);
-    border-radius: 18px;
-    padding: 16px;
-    box-shadow: 0 8px 28px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.04);
+  /* Brand (logo + titre) */
+  .brand{display:flex;align-items:center;gap:12px;margin:6px 0 14px}
+  .app-logo{
+    width:clamp(36px,4.2vw,56px);height:clamp(36px,4.2vw,56px);
+    border-radius:12px;box-shadow:0 4px 14px rgba(0,0,0,.25), inset 0 0 0 1px rgba(255,255,255,.06)
   }
+  h1{margin:0;font-size:clamp(20px,3.6vw,34px);letter-spacing:.3px}
 
+  .card{background:var(--panel);border-radius:18px;padding:16px;box-shadow:0 8px 28px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.04)}
   .controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
   @media (max-width:560px){ .controls{grid-template-columns:1fr} }
   .controls .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   label{color:var(--muted);font-size:14px}
-  select,input[type="range"]{
-    background:#0f1733;color:var(--ink);
-    border:1px solid #32447a;border-radius:10px;padding:6px 10px
-  }
+  select,input[type="range"]{background:#0f1733;color:var(--ink);border:1px solid #32447a;border-radius:10px;padding:6px 10px}
   .actions{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+  button{background:var(--accent);color:#1B1F38;border:0;border-radius:12px;padding:10px 16px;font-weight:900;cursor:pointer;box-shadow:0 6px 18px rgba(255,186,8,.35);transition:transform .08s ease, box-shadow .2s ease, filter .2s ease}
+  button:hover{transform:translateY(-1px);filter:saturate(1.1)}
+  button:active{transform:translateY(0);box-shadow:none}
 
-  button{
-    background: var(--accent); color: #1B1F38;
-    border:0;border-radius:12px;padding:10px 16px;font-weight:900;cursor:pointer;
-    box-shadow: 0 6px 18px rgba(255,186,8,.35);
-    transition: transform .08s ease, box-shadow .2s ease, filter .2s ease;
-  }
-  button:hover{ transform: translateY(-1px); filter: saturate(1.1); }
-  button:active{ transform: translateY(0); box-shadow:none; }
-
-  .header-bar{
-    background: linear-gradient(135deg,#253062 0%, #1f2a54 50%, #1b2448 100%);
-    border-radius: 12px; padding: 10px 14px; text-align:center;
-    font-weight:800; letter-spacing:.4px; color: var(--muted);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
-  }
+  .header-bar{background:linear-gradient(135deg,#253062,#1f2a54 50%,#1b2448);border-radius:12px;padding:10px 14px;text-align:center;font-weight:800;letter-spacing:.4px;color:var(--muted);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
 
   .grid-shell{display:flex;justify-content:center}
-  #grid-wrap{
-    width:var(--shell-w); padding:12px; border:1px solid #2a3a6d; border-radius:14px;
-    background:#141d3a; box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); margin:0 auto
-  }
-  #grid{display:grid;grid-template-columns:repeat(var(--N,14),1fr);gap:var(--gap);width:100%;touch-action:none}
+  #grid-wrap{width:var(--shell-w);padding:12px;border:1px solid #2a3a6d;border-radius:14px;background:#141d3a;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);margin:0 auto}
+  #grid{display:grid;grid-template-columns:repeat(var(--N,12),1fr);gap:var(--gap);width:100%;touch-action:none}
 
-  .cell{
-    background:var(--cell); border:1px solid var(--border);
-    display:flex; align-items:center; justify-content:center;
-    color:#f1f6ff; font-weight:800; aspect-ratio:1/1;
-    font-size: clamp(14px, calc(((var(--shell-w) - (var(--N) - 1) * var(--gap)) / var(--N)) * 0.56), 48px);
-    line-height:1; user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color: transparent;
-    white-space:nowrap; overflow:hidden; letter-spacing:0;
-    border-radius:10px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
-    transition: background .1s, transform .08s, box-shadow .2s, color .2s;
-  }
-  body[dir="rtl"] .cell{
-    font-size: clamp(13px, calc(((var(--shell-w) - (var(--N) - 1) * var(--gap)) / var(--N)) * 0.52), 44px);
-  }
-  .cell.sel{
-    background: var(--cell-sel); border-color: #ff4da0; color: #fff;
-    box-shadow: 0 0 0 8px rgba(247,37,133,.15), 0 0 24px rgba(124,195,255,.25) inset;
-    animation: pulseSelect .8s ease-out infinite; transform: scale(.98);
-  }
+  .cell{background:var(--cell);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:#f1f6ff;font-weight:800;aspect-ratio:1/1;
+    font-size:clamp(14px, calc(((var(--shell-w) - (var(--N) - 1) * var(--gap)) / var(--N)) * 0.56), 48px);
+    line-height:1;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;white-space:nowrap;overflow:hidden;letter-spacing:0;border-radius:10px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.04);transition:background .1s, transform .08s, box-shadow .2s, color .2s}
+  body[dir="rtl"] .cell{font-size:clamp(13px, calc(((var(--shell-w) - (var(--N) - 1) * var(--gap)) / var(--N)) * 0.52), 44px)}
+  .cell.sel{background:var(--cell-sel);border-color:#ff4da0;color:#fff;box-shadow:0 0 0 8px rgba(247,37,133,.15),0 0 24px rgba(124,195,255,.25) inset;animation:pulseSelect .8s ease-out infinite;transform:scale(.98)}
   @keyframes pulseSelect{0%{box-shadow:0 0 0 8px rgba(247,37,133,.18)}100%{box-shadow:0 0 0 18px rgba(247,37,133,0)}}
-  .cell.ok{
-    background: var(--cell-ok); border-color:#3de58e; color:#071b0b;
-    box-shadow: 0 0 18px rgba(61,229,142,.35) inset; animation: popFound .35s ease;
-  }
-  @keyframes popFound { 0%{transform:scale(1)} 50%{transform:scale(1.12)} 100%{transform:scale(1)} }
+  .cell.ok{background:var(--cell-ok);border-color:#3de58e;color:#071b0b;box-shadow:0 0 18px rgba(61,229,142,.35) inset;animation:popFound .35s ease}
+  @keyframes popFound{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}
   .cell.sol{outline:3px dashed #ffa726;outline-offset:-6px}
 
   .words{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;justify-content:center}
   .words .chip{background:#16244a;border:1px dashed #2f4a8a;color:#d4e6ff;padding:8px 12px;border-radius:999px;font-weight:800}
   .words .chip.ok{background:#0f3b24;border-color:#1f9d55;color:#bff6d1}
 
-  /* Bouton Installer */
   #installBtn[hidden]{display:none}
-  #installBtn{margin:6px 0 0 0}
-
-  /* Canvas de célébration (feux + confettis) */
-  #celebration-canvas{position:fixed; inset:0; pointer-events:none; z-index:9999}
+  #installBtn{margin:6px 0 0}
+  #celebration-canvas{position:fixed;inset:0;pointer-events:none;z-index:9999}
   </style>
 
   <title>EDUFUN</title>
@@ -150,7 +92,11 @@
 </head>
 <body>
 <div class="container">
-  <h1>🌍 EDUFUN — WordSearch</h1>
+  <!-- Brand -->
+  <div class="brand">
+    <img class="app-logo" src="./assets/icons/edufun-logo-192.png" alt="EDUFUN">
+    <h1>EDUFUN</h1>
+  </div>
 
   <div class="card">
     <div class="controls">
@@ -173,9 +119,12 @@
         </select>
       </div>
       <div class="row"><label>Taille :</label>
+        <!-- Valeur par défaut = 6 ; max = 12 -->
         <select id="size">
-          <option>6</option><option>8</option><option>10</option>
-          <option>12</option><option selected>14</option><option>16</option>
+          <option selected>6</option>
+          <option>8</option>
+          <option>10</option>
+          <option>12</option>
         </select>
       </div>
       <div class="row">
@@ -202,7 +151,7 @@
 
     <div class="grid-shell">
       <div id="grid-wrap" class="cont-africa">
-        <div id="grid" style="--N:14"></div>
+        <div id="grid" style="--N:12"></div>
         <div id="words" class="words"></div>
       </div>
     </div>
@@ -254,7 +203,7 @@ wordsRange.addEventListener("input",()=>wordsLabel.textContent=wordsRange.value)
 function syncDir(){ document.body.dir = (lang.value==="ar")?"rtl":"ltr"; document.documentElement.lang = lang.value; }
 lang.addEventListener("change",syncDir); syncDir();
 
-/* Accent par continent (si vous voulez changer des teintes à l’avenir) */
+/* Accent par continent */
 function setAccent(){ const wrap=$("#grid-wrap"); wrap.className=""; wrap.classList.add("cont-"+continent.value); }
 continent.addEventListener("change",setAccent); setAccent();
 
@@ -271,67 +220,31 @@ function victorySound(){ if(!sound.checked) return; const ac=ensureCtx(), notes=
     o.start(now+0.15*i); o.stop(now+0.15*i+0.27); });
 }
 
-/* ===== Festivités XXL ===== */
+/* Festivités XXL (confettis) */
 let fwCanvas, fwCtx, fwRaf;
 function ensureFireCanvas(){
   if (fwCanvas) return;
-  fwCanvas = document.createElement('canvas');
-  fwCanvas.id = 'celebration-canvas';
-  document.body.appendChild(fwCanvas);
-  fwCtx = fwCanvas.getContext('2d');
-  const resize = ()=>{ fwCanvas.width = window.innerWidth; fwCanvas.height = window.innerHeight; };
-  window.addEventListener('resize', resize); resize();
+  fwCanvas = document.createElement('canvas'); fwCanvas.id='celebration-canvas'; document.body.appendChild(fwCanvas);
+  fwCtx = fwCanvas.getContext('2d'); const resize=()=>{ fwCanvas.width=innerWidth; fwCanvas.height=innerHeight; }; addEventListener('resize',resize); resize();
 }
-function spawnParticles(x, y, color, count=70, speed=6){
-  const parts = [];
-  for (let i=0;i<count;i++){
-    const a = Math.random()*Math.PI*2;
-    const v = (0.5+Math.random())*speed;
-    parts.push({x, y, vx:Math.cos(a)*v, vy:Math.sin(a)*v-(Math.random()*2), life:60+Math.random()*40, r:2+Math.random()*3, color});
-  }
-  return parts;
+function spawnParticles(x,y,color,count=70,speed=6){
+  const parts=[]; for(let i=0;i<count;i++){ const a=Math.random()*Math.PI*2,v=(0.5+Math.random())*speed;
+    parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-(Math.random()*2),life:60+Math.random()*40,r:2+Math.random()*3,color}); } return parts;
 }
 function runFireworks(){
-  ensureFireCanvas();
-  const ctx = fwCtx, W = fwCanvas.width, H = fwCanvas.height;
-  let particles = [];
-  const colors = ['#FFBA08','#F72585','#3ABF47','#4AA3FF','#FB5607','#B5179E'];
-  for (let k=0;k<3;k++){
-    const cx = Math.random()*W*0.8 + W*0.1;
-    const cy = Math.random()*H*0.4 + H*0.1;
-    const col = colors[(Math.random()*colors.length)|0];
-    particles.push(...spawnParticles(cx, cy, col, 120, 7));
-  }
-  for (let i=0;i<250;i++){
-    const x = Math.random()*W, y = -20*Math.random();
-    const col = colors[i % colors.length];
-    particles.push({x,y,vx:(Math.random()*2-1)*1.5,vy:2+Math.random()*3,life:120+Math.random()*80,r:2+Math.random()*2,color:col});
-  }
+  ensureFireCanvas(); const ctx=fwCtx,W=fwCanvas.width,H=fwCanvas.height; let particles=[];
+  const colors=['#FFBA08','#F72585','#3ABF47','#4AA3FF','#FB5607','#B5179E'];
+  for(let k=0;k<3;k++){ const cx=Math.random()*W*0.8+W*0.1, cy=Math.random()*H*0.4+H*0.1, col=colors[(Math.random()*colors.length)|0]; particles.push(...spawnParticles(cx,cy,col,120,7)); }
+  for(let i=0;i<250;i++){ const x=Math.random()*W,y=-20*Math.random(), col=colors[i%colors.length]; particles.push({x,y,vx:(Math.random()*2-1)*1.5,vy:2+Math.random()*3,life:120+Math.random()*80,r:2+Math.random()*2,color:col}); }
   cancelAnimationFrame(fwRaf);
-  function tick(){
-    fwRaf = requestAnimationFrame(tick);
-    ctx.clearRect(0,0,W,H);
-    particles.forEach(p=>{
-      p.x += p.vx; p.y += p.vy; p.vy += 0.06; p.vx *= 0.995; p.life -= 1;
-      ctx.save(); ctx.globalAlpha = Math.max(0, p.life/150); ctx.fillStyle = p.color;
-      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill(); ctx.restore();
-    });
-    particles = particles.filter(p=>p.life>0 && p.y < H+50);
-    if (!particles.length) cancelAnimationFrame(fwRaf);
-  }
-  tick();
+  (function tick(){ fwRaf=requestAnimationFrame(tick); ctx.clearRect(0,0,W,H);
+    particles.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.vy+=0.06; p.vx*=0.995; p.life-=1; ctx.save(); ctx.globalAlpha=Math.max(0,p.life/150); ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); ctx.restore(); });
+    particles=particles.filter(p=>p.life>0 && p.y<H+50); if(!particles.length) cancelAnimationFrame(fwRaf);
+  })();
 }
-function bigVictoryJingle(){
-  if(!sound.checked) return;
-  const ac = ensureCtx(); const base = ac.currentTime;
-  const notes = [523,659,784,1046,880,988,1175];
-  notes.forEach((f,i)=>{
-    const o = ac.createOscillator(), g = ac.createGain();
-    o.type='sine'; o.frequency.value=f; o.connect(g); g.connect(ac.destination);
-    const t = base + i*0.12; g.gain.setValueAtTime(0.0001,t);
-    g.gain.exponentialRampToValueAtTime(0.35,t+0.03); g.gain.exponentialRampToValueAtTime(0.0001,t+0.28);
-    o.start(t); o.stop(t+0.3);
-  });
+function bigVictoryJingle(){ if(!sound.checked) return; const ac=ensureCtx(), base=ac.currentTime; const notes=[523,659,784,1046,880,988,1175];
+  notes.forEach((f,i)=>{ const o=ac.createOscillator(), g=ac.createGain(); o.type='sine'; o.frequency.value=f; o.connect(g); g.connect(ac.destination);
+    const t=base+i*0.12; g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.35,t+0.03); g.gain.exponentialRampToValueAtTime(0.0001,t+0.28); o.start(t); o.stop(t+0.3); });
 }
 
 /* Utils */
@@ -344,7 +257,8 @@ let STATE={};
 function makeGrid(){
   const lg=(lang?.value||'fr').toLowerCase();
   const cont=continent?.value||'africa';
-  const N = clamp(parseInt(size?.value,10)||14, 4, 24);
+  // Taille par défaut = 6, bornée à [4, 12]
+  const N = clamp(parseInt(size?.value,10)||6, 4, 12);
   const allowDiag=!!diag?.checked, allowRev=!!rev?.checked;
   const maxW= clamp(parseInt(wordsRange?.value,10)||20, 4, 50);
 
@@ -404,9 +318,9 @@ function makeGrid(){
 /* Sélection */
 function getCell(r,c){return grid.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`)}
 function clearSel(){grid.querySelectorAll(".cell.sel").forEach(el=>el.classList.remove("sel"))}
+function cellFromPoint(x,y){const el=document.elementFromPoint(x,y); if(!el) return null; if(el.classList.contains("cell")) return el; return el.closest?.(".cell")||null;}
 function paintPath(r0,c0,r1,c1){
-  clearSel();
-  const dr=Math.sign(r1-r0), dc=Math.sign(c1-c0);
+  clearSel(); const dr=Math.sign(r1-r0), dc=Math.sign(c1-c0);
   if(!(dr===0||dc===0||Math.abs(r1-r0)===Math.abs(c1-c0))) return;
   const steps=Math.max(Math.abs(r1-r0),Math.abs(c1-c0));
   for(let i=0;i<=steps;i++){const rr=r0+i*dr,cc=c0+i*dc; getCell(rr,cc).classList.add("sel");}
@@ -425,96 +339,42 @@ function finalizePath(){
     path.forEach(el=>{el.classList.remove("sel"); el.classList.add("ok");});
     const chip=wordsEl.querySelector(`.chip[data-word="${CSS.escape(matched)}"]`); if(chip) chip.classList.add("ok");
     STATE.found.add(matched);
-    clickSound();
-    checkWin();
+    clickSound(); checkWin();
   }else clearSel();
 }
-function cellFromPoint(x,y){
-  const el=document.elementFromPoint(x,y);
-  if(!el) return null;
-  if(el.classList.contains("cell")) return el;
-  return el.closest?.(".cell")||null;
-}
 function bindSelection(){
-  const onMove = (e)=>{
-    const p = e.touches? e.touches[0] : e;
-    const hit = cellFromPoint(p.clientX, p.clientY);
-    if(!STATE.selecting || !hit) return;
-    paintPath(STATE.start[0], STATE.start[1], +hit.dataset.r, +hit.dataset.c);
-  };
-  grid.onpointerdown = (e)=>{
-    const el=e.target.closest(".cell"); if(!el) return;
-    e.preventDefault(); grid.setPointerCapture?.(e.pointerId);
-    STATE.selecting=true; STATE.start=[+el.dataset.r,+el.dataset.c];
-    clearSel(); el.classList.add("sel");
-    grid.addEventListener("pointermove", onMove, {passive:false});
-    grid.addEventListener("touchmove", onMove, {passive:false});
-  };
-  const end = (e)=>{
-    if(!STATE.selecting) return;
-    STATE.selecting=false; grid.releasePointerCapture?.(e.pointerId);
-    grid.removeEventListener("pointermove", onMove);
-    grid.removeEventListener("touchmove", onMove);
-    const p = e.changedTouches? e.changedTouches[0] : e;
-    const hit = cellFromPoint(p.clientX, p.clientY);
-    if(hit) paintPath(STATE.start[0], STATE.start[1], +hit.dataset.r, +hit.dataset.c);
-    finalizePath();
-  };
+  const onMove=(e)=>{ const p=e.touches? e.touches[0] : e; const hit=cellFromPoint(p.clientX,p.clientY); if(!STATE.selecting||!hit) return; paintPath(STATE.start[0],STATE.start[1],+hit.dataset.r,+hit.dataset.c); };
+  grid.onpointerdown=(e)=>{ const el=e.target.closest(".cell"); if(!el) return; e.preventDefault(); grid.setPointerCapture?.(e.pointerId); STATE.selecting=true; STATE.start=[+el.dataset.r,+el.dataset.c]; clearSel(); el.classList.add("sel"); grid.addEventListener("pointermove",onMove,{passive:false}); grid.addEventListener("touchmove",onMove,{passive:false}); };
+  const end=(e)=>{ if(!STATE.selecting) return; STATE.selecting=false; grid.releasePointerCapture?.(e.pointerId); grid.removeEventListener("pointermove",onMove); grid.removeEventListener("touchmove",onMove);
+    const p=e.changedTouches? e.changedTouches[0] : e; const hit=cellFromPoint(p.clientX,p.clientY); if(hit) paintPath(STATE.start[0],STATE.start[1],+hit.dataset.r,+hit.dataset.c); finalizePath(); };
   grid.onpointerup=end; grid.ontouchend=end; grid.onpointercancel=end;
 }
 
-/* Victoire (version upgrade) */
+/* Victoire */
 function checkWin(){
-  const total = Object.keys(STATE.cellsPos).length;
-  if (STATE._won) return;
-  if(STATE.found.size===total && total>0){
-    STATE._won = true;
-    // ancien confetti texte si besoin : // confetti();
-    victorySound();
-    bigVictoryJingle();
-    runFireworks();
-    setTimeout(()=>{ STATE._won=false; }, 2500);
-  }
+  const total=Object.keys(STATE.cellsPos).length; if (STATE._won) return;
+  if(STATE.found.size===total && total>0){ STATE._won=true; victorySound(); bigVictoryJingle(); runFireworks(); setTimeout(()=>{ STATE._won=false; }, 2500); }
 }
 
 /* Solutions */
 let showSolutions=false;
 document.getElementById("toggleSol").addEventListener("click",()=>{
-  showSolutions=!showSolutions;
-  const btn=document.getElementById("toggleSol");
+  showSolutions=!showSolutions; const btn=document.getElementById("toggleSol");
   btn.textContent = showSolutions ? "Masquer les solutions" : "Afficher les solutions";
   grid.querySelectorAll(".cell").forEach(el=>el.classList.remove("sol"));
-  if(showSolutions){
-    for(const pos of Object.values(STATE.cellsPos)){
-      pos.forEach(([r,c])=> grid.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`).classList.add("sol"));
-    }
-  }
+  if(showSolutions){ for(const pos of Object.values(STATE.cellsPos)){ pos.forEach(([r,c])=> grid.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`).classList.add("sol")); } }
 });
 
 /* Bouton Installer (PWA) */
 let deferredPrompt=null;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  const btn = document.getElementById('installBtn');
-  if (btn) btn.hidden = false;
-});
-document.getElementById('installBtn')?.addEventListener('click', async () => {
-  if (!deferredPrompt) return;
-  const btn = document.getElementById('installBtn');
-  if (btn) btn.hidden = true;
-  await deferredPrompt.prompt();
-  try { await deferredPrompt.userChoice; } finally { deferredPrompt = null; }
-});
-window.addEventListener('appinstalled', () => {
-  const btn = document.getElementById('installBtn');
-  if (btn) btn.hidden = true;
-});
+window.addEventListener('beforeinstallprompt',(e)=>{ e.preventDefault(); deferredPrompt=e; const btn=document.getElementById('installBtn'); if(btn) btn.hidden=false; });
+document.getElementById('installBtn')?.addEventListener('click',async()=>{ if(!deferredPrompt) return; const btn=document.getElementById('installBtn'); if(btn) btn.hidden=true; await deferredPrompt.prompt(); try{ await deferredPrompt.userChoice; } finally{ deferredPrompt=null; } });
+window.addEventListener('appinstalled',()=>{ const btn=document.getElementById('installBtn'); if(btn) btn.hidden=true; });
 
 /* Init */
 document.getElementById("new").addEventListener("click", makeGrid);
 document.getElementById("wordsCountLabel").textContent = document.getElementById("wordsCount").value;
-makeGrid();
+makeGrid(); // démarre sur taille 6 par défaut
 </script>
 </body>
 </html>
