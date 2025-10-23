@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0b1620" />
 
   <!-- PWA -->
-  <link rel="manifest" href="manifest.webmanifest?v=10">
+  <link rel="manifest" href="manifest.webmanifest?v=12">
   <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/edufun-logo-192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="./assets/icons/edufun-logo-512.png">
   <link rel="apple-touch-icon" href="./assets/icons/edufun-logo-192.png">
@@ -96,7 +96,7 @@
     width:var(--shell-w); padding:12px; border:1px solid #2a3a6d; border-radius:14px;
     background:#141d3a; box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); margin:0 auto
   }
-  #grid{display:grid;grid-template-columns:repeat(var(--N,14),1fr);gap:var(--gap);width:100%;touch-action:none}
+  #grid{display:grid;grid-template-columns:repeat(var(--N,6),1fr);gap:var(--gap);width:100%;touch-action:none}
 
   .cell{
     background:var(--cell); border:1px solid var(--border);
@@ -146,6 +146,9 @@
   #splash .brand{font-weight:1000; letter-spacing:.5px; font-size:28px; color:#fff}
   #splash .hint{font-size:14px; color:#AFC7FF}
   #splash.hide{opacity:0; pointer-events:none; transition:opacity .35s ease}
+
+  /* Canvas de célébration (feux + confettis) */
+  #celebration-canvas{position:fixed; inset:0; pointer-events:none; z-index:9999}
   </style>
 
   <script>
@@ -222,7 +225,7 @@
 
       <div class="grid-shell">
         <div id="grid-wrap" class="cont-africa">
-          <div id="grid" style="--N:14"></div>
+          <div id="grid" style="--N:6"></div>
           <div id="words" class="words"></div>
         </div>
       </div>
@@ -260,7 +263,7 @@ const DATA = {
 const LETTERS={fr:"ABCDEFGHIJKLMNOPQRSTUVWXYZ",en:"ABCDEFGHIJKLMNOPQRSTUVWXYZ",es:"ABCDEFGHIJKLMNÑOPQRSTUVWXYZ",ar:"ابتثجحخدذرزسشصضطظعغفقكلمنهوي"};
 const titleBy={fr:{africa:"Afrique",europe:"Europe",asia:"Asie",north_america:"Amérique du Nord",south_america:"Amérique du Sud",oceania:"Océanie"},
               en:{africa:"Africa",europe:"Europe",asia:"Asia",north_america:"North America",south_america:"South America",oceania:"Oceania"},
-              es:{africa:"África",europe:"Europa",asia:"Asia",north_america:"América del Norte",south_america:"América del Sur",oceania:"Oceanía"},
+              es:{africa:"África",europe:"Europa",asia:"Asia",north_america:"América du Nord",south_america:"América du Sud",oceania:"Oceanía"},
               ar:{africa:"إفريقيا",europe:"أوروبا",asia:"آسيا",north_america:"أمريكا الشمالية",south_america:"أمريكا الجنوبية",oceania:"أوقيانوسيا"}};
 
 const $=s=>document.querySelector(s);
@@ -286,6 +289,95 @@ function clickSound(){ if(!sound.checked) return; const ac=ensureCtx(), o=ac.cre
   o.start(t); o.stop(t+0.1);
 }
 
+/* ===== Festivités de victoire ===== */
+let fwCanvas, fwCtx, fwRaf;
+function ensureFireCanvas(){
+  if (fwCanvas) return;
+  fwCanvas = document.createElement('canvas');
+  fwCanvas.id = 'celebration-canvas';
+  document.body.appendChild(fwCanvas);
+  fwCtx = fwCanvas.getContext('2d');
+  const resize = ()=>{ fwCanvas.width = innerWidth; fwCanvas.height = innerHeight; };
+  addEventListener('resize', resize); resize();
+}
+function spawnParticles(x, y, color, count=90, speed=7){
+  const parts = [];
+  for (let i=0;i<count;i++){
+    const a = Math.random()*Math.PI*2;
+    const v = (0.5+Math.random())*speed;
+    parts.push({x, y, vx:Math.cos(a)*v, vy:Math.sin(a)*v-(Math.random()*2), life:60+Math.random()*40, r:2+Math.random()*3, color});
+  }
+  return parts;
+}
+function runFireworks(){
+  ensureFireCanvas();
+  const ctx = fwCtx, W = fwCanvas.width, H = fwCanvas.height;
+  let particles = [];
+  const colors = ['#FFBA08','#F72585','#3ABF47','#4AA3FF','#FB5607','#B5179E'];
+  for (let k=0;k<3;k++){
+    const cx = Math.random()*W*0.8 + W*0.1;
+    const cy = Math.random()*H*0.4 + H*0.1;
+    const col = colors[(Math.random()*colors.length)|0];
+    particles.push(...spawnParticles(cx, cy, col, 120, 7));
+  }
+  for (let i=0;i<220;i++){
+    const x = Math.random()*W, y = -20*Math.random();
+    const col = colors[i % colors.length];
+    particles.push({x,y,vx:(Math.random()*2-1)*1.4,vy:2+Math.random()*3,life:120+Math.random()*80,r:2+Math.random()*2,color:col});
+  }
+  cancelAnimationFrame(fwRaf);
+  (function tick(){
+    fwRaf = requestAnimationFrame(tick);
+    ctx.clearRect(0,0,W,H);
+    particles.forEach(p=>{
+      p.x += p.vx; p.y += p.vy; p.vy += 0.06; p.vx *= 0.995; p.life -= 1;
+      ctx.save(); ctx.globalAlpha = Math.max(0, p.life/150); ctx.fillStyle = p.color;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill(); ctx.restore();
+    });
+    particles = particles.filter(p=>p.life>0 && p.y < H+50);
+    if (!particles.length) cancelAnimationFrame(fwRaf);
+  })();
+}
+function victorySound(){
+  if(!sound?.checked) return;
+  const AC = (window.AudioContext||window.webkitAudioContext);
+  if(!AC) return;
+  const ac = (window._ac || (window._ac = new AC()));
+  const now=ac.currentTime, tones=[880,1175,1568];
+  tones.forEach((f,i)=>{ const o=ac.createOscillator(), g=ac.createGain();
+    o.type="triangle"; o.frequency.value=f; o.connect(g); g.connect(ac.destination);
+    g.gain.setValueAtTime(0.0001, now+0.15*i);
+    g.gain.exponentialRampToValueAtTime(0.35, now+0.15*i+0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001, now+0.15*i+0.25);
+    o.start(now+0.15*i); o.stop(now+0.15*i+0.27);
+  });
+}
+function bigVictoryJingle(){
+  if(!sound?.checked) return;
+  const AC = (window.AudioContext||window.webkitAudioContext);
+  if(!AC) return;
+  const ac = (window._ac || (window._ac = new AC()));
+  const base = ac.currentTime, notes = [523,659,784,1046,880,988,1175];
+  notes.forEach((f,i)=>{ const o=ac.createOscillator(), g=ac.createGain();
+    o.type='sine'; o.frequency.value=f; o.connect(g); g.connect(ac.destination);
+    const t = base + i*0.12; g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(0.35,t+0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+0.28);
+    o.start(t); o.stop(t+0.3);
+  });
+}
+function checkWin(){
+  const total = Object.keys(STATE.cellsPos||{}).length;
+  if (STATE._won || !total) return;
+  if (STATE.found?.size === total){
+    STATE._won = true;
+    victorySound();
+    bigVictoryJingle();
+    runFireworks();
+    setTimeout(()=>{ STATE._won=false; }, 2500);
+  }
+}
+
 /* Utils */
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
 const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -296,7 +388,7 @@ let STATE={};
 function makeGrid(){
   const lg=(lang?.value||'fr').toLowerCase();
   const cont=continent?.value||'africa';
-  const N = clamp(parseInt(size?.value,10)||6, 4, 24);   // démarre sur 6
+  const N = clamp(parseInt(size?.value,10)||6, 4, 12);   // démarre et borne à 12 max
   const allowDiag=!!diag?.checked, allowRev=!!rev?.checked;
   const maxW= clamp(parseInt(wordsRange?.value,10)||20, 4, 50);
 
@@ -349,7 +441,7 @@ function makeGrid(){
   const t=titleBy[lg][cont]; const lgName={fr:"Français",en:"English",es:"Español",ar:"العربية"}[lg]||"";
   titleBar.textContent = t ? `${t} — ${lgName}` : lgName;
 
-  STATE={N,M,cellsPos,found:new Set(),start:null,selecting:false,lang:lg};
+  STATE={N,M,cellsPos,found:new Set(),start:null,selecting:false,lang:lg,_won:false};
   bindSelection();
 
   // cacher le splash (première grille prête)
@@ -362,6 +454,12 @@ function makeGrid(){
 /* Sélection */
 function getCell(r,c){return grid.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`)}
 function clearSel(){grid.querySelectorAll(".cell.sel").forEach(el=>el.classList.remove("sel"))}
+function cellFromPoint(x,y){
+  const el=document.elementFromPoint(x,y);
+  if(!el) return null;
+  if(el.classList.contains("cell")) return el;
+  return el.closest?.(".cell")||null;
+}
 function paintPath(r0,c0,r1,c1){
   clearSel();
   const dr=Math.sign(r1-r0), dc=Math.sign(c1-c0);
@@ -384,13 +482,8 @@ function finalizePath(){
     const chip=wordsEl.querySelector(`.chip[data-word="${CSS.escape(matched)}"]`); if(chip) chip.classList.add("ok");
     STATE.found.add(matched);
     clickSound();
+    checkWin(); // <<< important
   }else clearSel();
-}
-function cellFromPoint(x,y){
-  const el=document.elementFromPoint(x,y);
-  if(!el) return null;
-  if(el.classList.contains("cell")) return el;
-  return el.closest?.(".cell")||null;
 }
 function bindSelection(){
   const onMove = (e)=>{
