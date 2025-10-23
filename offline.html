@@ -1,27 +1,35 @@
-<!DOCTYPE html>
+<!-- /offline.html -->
+<!doctype html>
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Hors ligne — EDUFUN</title>
-  <meta name="theme-color" content="#0b1620" />
+  <meta name="theme-color" content="#0b1620">
+  <title>EDUFUN — Hors-ligne</title>
+  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/edufun-logo-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./assets/icons/edufun-logo-512.png">
   <style>
-    :root{ --bg:#12162a; --ink:#eaf2ff; --muted:#a9b8e8; --accent:#FFBA08 }
-    *{box-sizing:border-box} html,body{height:100%}
-    body{margin:0;background:radial-gradient(1000px 1000px at 70% -150px,#20305f 0%,#1B1F38 45%,#12162a 100%); color:var(--ink); font:500 16px/1.5 system-ui,-apple-system,"Segoe UI",Arial,sans-serif; display:grid; place-items:center; padding:24px}
-    .card{max-width:560px; width:100%; background:#1b2344; border-radius:18px; padding:22px; text-align:center; box-shadow:0 18px 60px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.06)}
-    .logo{width:96px;height:96px;border-radius:20px;display:block;margin:0 auto 12px;box-shadow:0 6px 20px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.08)}
-    h1{margin:6px 0 8px;font-size:28px;letter-spacing:.3px}
+    :root{--bg:#0b1620;--panel:#1b2448;--ink:#fff;--muted:#9fb3d1;--accent:#ffba08}
+    *{box-sizing:border-box} html,body{height:100%} body{
+      margin:0;background:radial-gradient(1200px 1200px at 70% -200px,#20305f 0%,#1B1F38 45%,#12162a 100%);
+      color:var(--ink);font:16px/1.5 system-ui, -apple-system, "Segoe UI", Arial, sans-serif;display:flex;align-items:center;justify-content:center
+    }
+    .card{max-width:720px;width:92%;background:var(--panel);border-radius:18px;padding:24px;text-align:center;
+      box-shadow:0 8px 28px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.05)}
+    .logo{width:96px;height:96px;border-radius:20px;background:#193063 url("./assets/icons/edufun-logo-512.png") center/72% no-repeat;margin:0 auto 16px}
+    h1{margin:0 0 8px;font-size:28px;letter-spacing:.3px}
     p{margin:0 0 14px;color:var(--muted)}
-    .btn{display:inline-block;margin-top:6px;background:var(--accent);color:#1b1f38;text-decoration:none;font-weight:900;border-radius:12px;padding:10px 16px;box-shadow:0 6px 18px rgba(255,186,8,.35)}
+    .btn{display:inline-block;margin-top:8px;background:var(--accent);color:#172036;font-weight:800;padding:10px 16px;border-radius:12px;text-decoration:none}
+    .tips{margin-top:14px;font-size:14px;color:#cbd6ea}
   </style>
 </head>
 <body>
   <div class="card">
-    <img class="logo" src="./assets/icons/edufun-logo-192.png" alt="">
+    <div class="logo" aria-hidden="true"></div>
     <h1>Vous êtes hors-ligne</h1>
-    <p>Le contenu déjà en cache reste disponible. Certaines pages ou images récentes peuvent ne pas se charger sans connexion.</p>
+    <p>La page demandée n’est pas disponible en mode hors-ligne.</p>
     <a class="btn" href="./">Réessayer</a>
+    <div class="tips">Astuce : quand la connexion revient, rechargez l’application (Ctrl+R).</div>
   </div>
 </body>
 </html>
