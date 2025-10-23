@@ -1,21 +1,26 @@
-// sw.js — scope = racine si enregistré via "./sw.js"
-const CACHE = "edufun-v2";  // <— incrémente quand tu modifies les assets
+// sw.js — EDUFUN
+const CACHE = "edufun-v3";
+
 const ASSETS = [
   "./",
   "./index.html",
+  "./offline.html",
   "./manifest.webmanifest",
-  // Fonts
-  "./fonts/NotoKufiArabic-Regular.woff2",
-  "./fonts/NotoKufiArabic-Bold.woff2",
-  // Icons
+  "./sw.js",
+
+  // Icônes
   "./assets/icons/edufun-logo-192.png",
   "./assets/icons/edufun-logo-512.png",
-  // Offline page
-  "./offline.html"
+
+  // Polices locales
+  "./fonts/NotoKufiArabic-Regular.woff2",
+  "./fonts/NotoKufiArabic-Bold.woff2",
 ];
 
 self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+  e.waitUntil(
+    caches.open(CACHE).then((c) => c.addAll(ASSETS))
+  );
   self.skipWaiting();
 });
 
@@ -31,39 +36,34 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const req = e.request;
 
-  // 1) Fallback OFFLINE pour les navigations (URL tapées/clicks internes)
-  if (req.mode === "navigate") {
+  // Documents/Images/CSS/JS/Fonts/Manifest → cache-first
+  const isAsset =
+    req.method === "GET" &&
+    ["document", "image", "style", "script", "font", "manifest"].includes(req.destination || "");
+
+  if (isAsset) {
     e.respondWith(
-      (async () => {
-        try {
-          // Essaye réseau d'abord (meilleures mises à jour)
-          const fresh = await fetch(req);
-          const cache = await caches.open(CACHE);
-          cache.put(req, fresh.clone());
-          return fresh;
-        } catch (err) {
-          // Réseau KO → essaye cache → sinon offline.html
-          const cached = await caches.match(req);
-          return cached || caches.match("./offline.html");
+      caches.match(req).then((res) => res || fetch(req).then((net) => {
+        // mise à jour du cache en arrière-plan
+        const copy = net.clone();
+        caches.open(CACHE).then((c) => c.put(req, copy));
+        return net;
+      }).catch(() => {
+        // Fallback navigation → offline.html
+        if (req.mode === "navigate") {
+          return caches.match("./offline.html");
         }
-      })()
+        return caches.match(req);
+      }))
     );
     return;
   }
 
-  // 2) Cache-first pour les assets statiques (icônes, fonts, images…)
-  if (
-    req.method === "GET" &&
-    (req.destination === "image" || req.destination === "style" ||
-     req.destination === "script" || req.destination === "font" ||
-     req.destination === "manifest" || req.destination === "document")
-  ) {
-    e.respondWith(
-      caches.match(req).then(r => r || fetch(req).then(res => {
-        const copy = res.clone();
-        caches.open(CACHE).then(c => c.put(req, copy));
-        return res;
-      }))
-    );
-  }
+  // Toute autre requête : tentative réseau, puis fallback navigation
+  e.respondWith(
+    fetch(req).catch(() => {
+      if (req.mode === "navigate") return caches.match("./offline.html");
+      return caches.match(req);
+    })
+  );
 });
