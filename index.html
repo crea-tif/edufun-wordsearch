@@ -3,10 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0b1620" />
+  <meta name="theme-color" content="#0b1628" />
+  <meta name="application-name" content="EDUFUN" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="EDUFUN" />
 
   <!-- PWA -->
-  <link rel="manifest" href="manifest.webmanifest?v=12">
+  <!-- IMPORTANT : pointer vers manifest.json (et non manifeste.webmanifest) -->
+  <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/edufun-logo-192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="./assets/icons/edufun-logo-512.png">
   <link rel="apple-touch-icon" href="./assets/icons/edufun-logo-192.png">
@@ -152,22 +157,34 @@
   </style>
 
   <script>
-    // Service Worker
+    // --- Service Worker (scope correct en local et sur GitHub Pages) ---
     if ('serviceWorker' in navigator) {
-      addEventListener('load', async () => {
+      window.addEventListener('load', async () => {
         try {
-          await navigator.serviceWorker.register('./sw.js');
+          // si tu héberges sur /edufun-wordsearch/, on en tient compte
+          const base = location.pathname.includes('/edufun-wordsearch/')
+            ? '/edufun-wordsearch/'
+            : '/';
+          await navigator.serviceWorker.register(base + 'sw.js', { scope: base });
           await navigator.serviceWorker.ready;
-        } catch (e) { console.warn(e); }
+        } catch (e) {
+          console.warn('SW registration failed:', e);
+        }
       });
     }
   </script>
 </head>
 <body>
+  <noscript>
+    <div style="max-width:980px;margin:16px auto;padding:12px;border-radius:12px;background:#222A4A;color:#fff">
+      EDUFUN nécessite JavaScript pour fonctionner.
+    </div>
+  </noscript>
+
   <!-- SPLASH SCREEN (disparaît quand la 1ère grille est prête) -->
   <div id="splash" aria-hidden="true">
-    <div class="sbox">
-      <img src="./assets/icons/edufun-logo-192.png" alt="EDUFUN" width="96" height="96" />
+    <div class="sbox" role="status" aria-live="polite">
+      <img src="./assets/icons/edufun-logo-192.png" alt="Logo EDUFUN" width="96" height="96" />
       <div class="brand">EDUFUN</div>
       <div class="hint">Chargement…</div>
     </div>
@@ -176,10 +193,10 @@
   <div class="container">
     <h1>🌍 EDUFUN — WordSearch</h1>
 
-    <div class="card">
+    <div class="card" role="region" aria-label="Paramètres et grille">
       <div class="controls">
-        <div class="row"><label>Continent :</label>
-          <select id="continent">
+        <div class="row"><label for="continent">Continent :</label>
+          <select id="continent" aria-label="Continent">
             <option value="africa">Afrique</option>
             <option value="europe">Europe</option>
             <option value="asia">Asie</option>
@@ -188,16 +205,16 @@
             <option value="oceania">Océanie</option>
           </select>
         </div>
-        <div class="row"><label>Langue :</label>
-          <select id="lang">
+        <div class="row"><label for="lang">Langue :</label>
+          <select id="lang" aria-label="Langue">
             <option value="fr">Français</option>
             <option value="en">English</option>
             <option value="es">Español</option>
             <option value="ar">العربية</option>
           </select>
         </div>
-        <div class="row"><label>Taille :</label>
-          <select id="size">
+        <div class="row"><label for="size">Taille :</label>
+          <select id="size" aria-label="Taille de la grille">
             <option selected>6</option><option>8</option><option>10</option><option>12</option>
           </select>
         </div>
@@ -209,9 +226,9 @@
           <label><input type="checkbox" id="sound" checked> son (click)</label>
         </div>
         <div class="row">
-          <label>Mots :</label>
-          <input id="wordsCount" type="range" min="4" max="24" value="20">
-          <span id="wordsCountLabel">20</span>
+          <label for="wordsCount">Mots :</label>
+          <input id="wordsCount" type="range" min="4" max="24" value="20" aria-labelledby="wordsCountLabel">
+          <span id="wordsCountLabel" aria-live="polite">20</span>
         </div>
       </div>
 
@@ -221,12 +238,12 @@
         <button id="installBtn" hidden>Installer l'application</button>
       </div>
 
-      <div id="titleBar" class="header-bar">—</div>
+      <div id="titleBar" class="header-bar" role="heading" aria-level="2">—</div>
 
       <div class="grid-shell">
         <div id="grid-wrap" class="cont-africa">
           <div id="grid" style="--N:6"></div>
-          <div id="words" class="words"></div>
+          <div id="words" class="words" aria-live="polite"></div>
         </div>
       </div>
     </div>
@@ -428,7 +445,7 @@ function makeGrid(){
   }
 
   const letters=LETTERS[lg] || LETTERS.fr;
-  for(let r=0;r<N;r++)for(let c=0;c<N;c++) if(!M[r][c]) M[r][c]=letters[(Math.random()*letters.length)|0];
+  for(let r=0;r<N;r++)for(let c=0;c<N)c++) if(!M[r][c]) M[r][c]=letters[(Math.random()*letters.length)|0];
 
   for(let r=0;r<N;r++)for(let c=0;c<N;c++){
     const d=document.createElement("div"); d.className="cell"; d.dataset.r=r; d.dataset.c=c; d.textContent=M[r][c]; grid.appendChild(d);
