@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-title" content="EDUFUN" />
 
   <!-- PWA -->
-  <!-- IMPORTANT : pointer vers manifest.json (et non manifeste.webmanifest) -->
+  <!-- IMPORTANT : on pointe sur manifest.json (et plus manifeste.webmanifest) -->
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/edufun-logo-192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="./assets/icons/edufun-logo-512.png">
@@ -157,12 +157,12 @@
   </style>
 
   <script>
-    // --- Service Worker (scope correct en local et sur GitHub Pages) ---
+    // --- Service Worker (scope correct sous GitHub Pages & en local) ---
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', async () => {
         try {
-          // si tu héberges sur /edufun-wordsearch/, on en tient compte
-          const base = location.pathname.includes('/edufun-wordsearch/')
+          // Détecte si on est servi sous /edufun-wordsearch/
+          const base = (location.pathname.includes('/edufun-wordsearch/'))
             ? '/edufun-wordsearch/'
             : '/';
           await navigator.serviceWorker.register(base + 'sw.js', { scope: base });
@@ -445,7 +445,7 @@ function makeGrid(){
   }
 
   const letters=LETTERS[lg] || LETTERS.fr;
-  for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) if (!M[r][c]) M[r][c] = letters[(Math.random() * letters.length) | 0];
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++) if(!M[r][c]) M[r][c]=letters[(Math.random()*letters.length)|0];
 
   for(let r=0;r<N;r++)for(let c=0;c<N;c++){
     const d=document.createElement("div"); d.className="cell"; d.dataset.r=r; d.dataset.c=c; d.textContent=M[r][c]; grid.appendChild(d);
