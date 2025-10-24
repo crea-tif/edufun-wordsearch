@@ -1,13 +1,14 @@
 {
-  "name": "EDUFUN - Mots mêlés",
+  "name": "EDUFUN — Mots mêlés",
   "short_name": "EDUFUN",
-  "start_url": "/edufun-wordsearch/",
+  "lang": "fr-FR",
+  "start_url": "/edufun-wordsearch/?source=pwa",
   "scope": "/edufun-wordsearch/",
   "display": "standalone",
   "orientation": "portrait",
   "theme_color": "#0b1628",
   "background_color": "#0b1628",
-  "description": "Jeu éducatif : cherche les pays du monde dans une grille - version EDUFUN",
+  "description": "Jeu éducatif : cherche les pays du monde dans une grille — version EDUFUN.",
   "icons": [
     {
       "src": "assets/icons/edufun-logo-192.png",
