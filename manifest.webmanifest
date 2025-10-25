@@ -1,15 +1,14 @@
-{
-  "id": "./",
-  "name": "EDUFUN",
-  "short_name": "EDUFUN",
-  "description": "Cherche des pays du monde dans une grille — version EDUFUN.",
-  "start_url": "./",
-  "scope": "./",
+"id": "/",
+  "name": "EDU’FUN WordSearch",
+  "short_name": "EDU’FUN",
+  "description": "Jeu éducatif : mots mêlés — version EDU’FUN",
+  "start_url": "/edufun-wordsearch/",
+  "scope": "/edufun-wordsearch/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
   "orientation": "portrait",
-  "theme_color": "#0b1620",
-  "background_color": "#0b1620",
+  "theme_color": "#08101E",
+  "background_color": "#08101E",
   "icons": [
     { "src": "assets/icons/edufun-logo-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
     { "src": "assets/icons/edufun-logo-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
