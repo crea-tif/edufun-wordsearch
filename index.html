@@ -35,27 +35,23 @@
 
   /* ===== Thème & UI ===== */
   :root{
-  --bg:#0A0F1C;
-  --panel:#111A2E;
-  --ink:#ffffff;
-  --muted:#D8ECFF;
-  --accent:#FFFFFF;
-  --cell:#1E2B52;
-  --cell-sel:#9ED8FF;
-  --cell-ok:#3ABF47;
-  --border:#80C8FF;
-  --gap:8px;
-  --shell-w:min(92vw,680px);
-}
-
-/* fond pastel doux */
-body{
-  margin:0; color:var(--ink);
-  background:
-    radial-gradient(1200px 1200px at 70% -200px, #B6E5FF 0%, #7CC4FF 40%, #0A0F1C 100%),
-    linear-gradient(135deg, rgba(255,150,240,0.25) 0%, rgba(158,216,255,0.3) 100%);
-  background-blend-mode: screen, normal;
-  font-family: Inter, system-ui, "Noto Kufi Arabic", sans-serif;
+    --bg:#1B1F38;
+    --panel:#222A4A;
+    --ink:#ffffff;
+    --muted:#AFC7FF;
+    --accent:#FFBA08;
+    --cell:#2D3A68;
+    --cell-sel:#F72585;
+    --cell-ok:#3ABF47;
+    --border:#4AA3FF;
+    --gap:8px; --shell-w:min(92vw,680px);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; color:var(--ink);
+    background: radial-gradient(1200px 1200px at 70% -200px, #20305f 0%, #1B1F38 45%, #12162a 100%);
+    font-family: Inter, system-ui, "Noto Kufi Arabic", sans-serif;
 }
 
   }
