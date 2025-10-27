@@ -1,28 +1,32 @@
-// sw.js — EDUFUN (PWA)
-const CACHE = "edufun-v3";
+// sw.js — EDU'FUN PWA (offline robuste)
+const CACHE = "edufun-v5";
+
+// Chemin racine (utile sur GitHub Pages : /edufun-wordsearch/)
+const SCOPE = new URL(self.registration.scope);
+const BASE = SCOPE.pathname.replace(/\/$/, ""); // ex. "/edufun-wordsearch"
+
+const A = (p) => new URL(BASE + "/" + p.replace(/^\/+/, ""), SCOPE).toString();
 
 const ASSETS = [
-  "./",
-  "./index.html",
-  "./manifest.webmanifest",
-  "./offline.html",
-  "./assets/icons/edufun-logo-192.png",
-  "./assets/icons/edufun-logo-512.png",
-  "./fonts/NotoKufiArabic-Regular.woff2",
-  "./fonts/NotoKufiArabic-Bold.woff2",
+  A(""),                     // "/edufun-wordsearch/"
+  A("index.html"),
+  A("offline.html"),
+  A("manifest.webmanifest"),
+  A("assets/icons/edufun-logo-192.png"),
+  A("assets/icons/edufun-logo-512.png"),
+  A("fonts/NotoKufiArabic-Regular.woff2"),
+  A("fonts/NotoKufiArabic-Bold.woff2"),
 ];
 
 self.addEventListener("install", (e) => {
   e.waitUntil((async () => {
     const cache = await caches.open(CACHE);
-    await Promise.allSettled(
-      ASSETS.map(async (url) => {
-        try {
-          const res = await fetch(url, { cache: "no-cache" });
-          if (res && res.ok) await cache.put(url, res.clone());
-        } catch {}
-      })
-    );
+    await Promise.allSettled(ASSETS.map(async (url) => {
+      try {
+        const res = await fetch(url, { cache: "no-cache" });
+        if (res && res.ok) await cache.put(url, res.clone());
+      } catch {/* ignore */}
+    }));
     await self.skipWaiting();
   })());
 });
@@ -37,52 +41,50 @@ self.addEventListener("activate", (e) => {
 
 self.addEventListener("fetch", (e) => {
   const req = e.request;
-  const dest = req.destination || "";
-  const url = req.url || "";
 
-  // 👇 Ignore anything that isn't http(s) (e.g., chrome-extension://)
-  if (!/^https?:\/\//i.test(url)) return;
+  // On ne gère que GET http(s)
+  if (req.method !== "GET") return;
+  const url = new URL(req.url);
+  if (!/^https?:$/.test(url.protocol)) return;
 
-  // Pages / navigations -> network first, fallback offline
-  if (req.mode === "navigate" || dest === "document") {
+  // 1) Navigations (pages)
+  if (req.mode === "navigate" || req.destination === "document") {
     e.respondWith((async () => {
-      try { return await fetch(req); }
-      catch {
-        return (await caches.match("./offline.html")) ||
-          new Response("Vous êtes hors-ligne.", {
-            status: 503, headers: { "Content-Type": "text/plain; charset=utf-8" }
-          });
-      }
-    })());
-    return;
-  }
-
-  // Static assets -> cache first
-  if (["image","style","script","font","manifest"].includes(dest)) {
-    e.respondWith((async () => {
-      const cached = await caches.match(req);
-      if (cached) return cached;
+      // Réseau d'abord
       try {
         const res = await fetch(req);
-        if (res && res.ok) (await caches.open(CACHE)).put(req, res.clone()).catch(()=>{});
+        // met à jour le cache de la page d’accueil si c’est elle
+        if (url.pathname === BASE + "/" || url.pathname === BASE + "/index.html") {
+          (await caches.open(CACHE)).put(A("index.html"), res.clone()).catch(()=>{});
+        }
         return res;
       } catch {
-        return new Response("", { status: 504 });
+        // puis index.html en cache si dispo, sinon page offline
+        const cache = await caches.open(CACHE);
+        const cachedHome = await cache.match(A("index.html"));
+        if (cachedHome) return cachedHome;
+        const offline = await cache.match(A("offline.html"));
+        return offline || new Response("Hors-ligne", { status: 503 });
       }
     })());
     return;
   }
 
-  // Other requests -> network, fallback cache / offline for HTML-ish
+  // 2) Static / runtime assets (JS/CSS/images/fonts/CDN) — cache d'abord
   e.respondWith((async () => {
-    try { return await fetch(req); }
-    catch {
-      const cached = await caches.match(req);
-      if (cached) return cached;
-      if (req.headers.get("accept")?.includes("text/html")) {
-        const offline = await caches.match("./offline.html");
-        if (offline) return offline;
+    const cache = await caches.open(CACHE);
+    const cached = await cache.match(req);
+    if (cached) return cached;
+
+    try {
+      const res = await fetch(req);
+      // Met en cache même les réponses opaques (CDN)
+      if (res && (res.ok || res.type === "opaque")) {
+        cache.put(req, res.clone()).catch(()=>{});
       }
+      return res;
+    } catch {
+      // Dernier recours : rien / 504
       return new Response("", { status: 504 });
     }
   })());
